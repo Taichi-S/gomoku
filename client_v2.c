@@ -97,6 +97,101 @@ int main(void) {
 		}else{
 			board[bx-1][by-1]=1;
 		}
+
+		//禁じ手判定のプログラム
+		int end_flag = 0;
+		if(board[bx-1][by-1] == 1){ //相手先行で、手を置いた時
+			//三三禁
+			char xsigns[8]="++0-";	//対象座標から八方への走査に必要な符号
+			char ysigns[8]="0+++";
+
+			int ki = 0;
+			int mj = 0;
+			for(ki = 1; ki < BOARD_SQUARE + 1; ki++ ){
+
+				for(mj = 1; mj < BOARD_SQUARE + 1; mj++ ){
+					int san_counter = 0; //三三禁になりうる三を数えるもの
+
+					if(board[mj-1][ki-1] == 1){	//対象座標が、先行の相手が置いたもの
+						int ik = 0;
+						for(ik = 0; ik < 4; ik ++){	//対象座標から八方（４X２）を走査
+							int xvector;	//対象座標から進む向きをここに入れる
+							int yvector;
+
+							switch (xsigns[ik]){	//対象座標から進む向きを決定
+								case '+': xvector = 1; break;
+								case '-': xvector = -1; break;
+								case '0': xvector = 0; break;
+							}
+
+							switch (ysigns[ik]){
+								case '+': yvector = 1; break;
+								case '-': yvector = -1; break;
+								case '0': yvector = 0; break;
+							}
+
+							int jm = 0;
+							int xweight = 0;	//対象座標が進む向きと大きさをここに入れる
+							int yweight = 0;
+							int xmax = mj-1;	//対象の座標を含む直線上にあり、判定に必要な最大の座標と最小の座標をここに入れる
+							int ymax = ki-1;
+							int xmin = mj-1;
+							int ymin = ki-1;
+							int black_counter = 0;	//対象の座標を含む直線上にある先攻の手を数えるもの
+
+							for(int jm = 0; jm < 4; jm++){ //対象座標から三々禁となりうる直線上の範囲を走査
+								xweight += xvector;	//対象座標が進む向きと大きさを決定
+								yweight += yvector;
+	
+								if(board[mj-1+xweight][ki-1+yweight] == 1){	//進んだ先の座標が先攻（相手）の手であれば-(*)
+									black_counter++; //対象の座標を含む直線上にある先攻の手をカウント
+									xmax = ki-1+xweight; //その手（座標）を最大座標として保存
+									ymax = mj-1+yweight;
+								} 
+
+								if(black_counter == 2){	//対象座標の他に直線上にある先攻の手が２つあれば
+									san_counter++; //三々禁となりうる三をカウント
+									break;	//今回の直線の走査は終了
+								}
+
+								if(xmax - xmin > 4 || ymax - ymin > 4) break; //三となり得ない範囲まで走査したら、今回の直線の走査は終了
+
+								if(board[mj-1-xweight][ki-1-yweight] == 1){ //（*)とは反対向きに進んだ先の座標が先攻（相手）の手であれば
+									black_counter++;	//対象の座標を含む直線上にある先攻の手をカウント
+									xmin = ki-1-xweight;	//その手（座標）を最小座標として保存
+									ymin = mj-1-yweight;
+								}
+
+								if(black_counter == 2){	//対象座標の他に直線上にある先攻の手が２つあれば
+								san_counter++;	//三々禁となりうる三をカウント
+								break;	//今回の直線の走査は終了
+							}
+
+								if(xmax - xmin > 4 || ymax - ymin > 4) break;	//三となり得ない範囲まで走査したら、今回の直線の走査は終了
+
+							}
+						
+						}
+
+						if(san_counter == 2) {	//三三禁があれば
+							puts("It is forbidden hand!");
+							end_flag = 1;
+							break;	//禁じ手のプログラムを終了
+						}
+					}else{
+						
+					}
+
+					if(end_flag) break;
+
+				}
+					if(end_flag) break;
+			}
+			if(end_flag){
+				puts("I am Winner!!");
+				while(1);
+			}
+		} 
 		
 	    int i=0;
 	    printf("  ");
