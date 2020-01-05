@@ -212,7 +212,7 @@ int main(void) {
 							puts("It is forbidden hand!:yonyonkin");
 							end_flag = 1;
 							break;	//禁じ手のプログラムを終了
-						}else if(san_counter == 2) {	//三三禁があれば
+						}else if(san_counter == 2 && yon_counter == 0) {	//三三禁があれば
 							puts("It is forbidden hand!:sansankin");
 							end_flag = 1;
 							break;	//禁じ手のプログラムを終了
