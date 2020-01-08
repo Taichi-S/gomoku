@@ -1,8 +1,6 @@
-//http://blog.livedoor.jp/akf0/archives/51585502.html
-
+// #include <winsock2.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <winsock2.h>
 #include <string.h>
 
 #define BOARD_SQUARE 15
@@ -13,7 +11,7 @@ int split(char *dst[], char *src, char delim);
 void boardScoring();
 int boardScore(int checkBoard[], int whichPlayer);
 char convertInt(int array[]);
-int forbidden_hand_judgement(int board[BOARD_SQUARE][BOARD_SQUARE])
+int forbidden_hand_judgement(int board[BOARD_SQUARE][BOARD_SQUARE]);
 
 //盤面の情報を記録しておく配列
 int board[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
@@ -25,8 +23,8 @@ int scoreBoard[BOARD_SQUARE][BOARD_SQUARE][2] = {{0}};
 int player_number;
 int enemy_number;
 
-//勝利フラッグ(自分が勝ったらtrue)
-bool isWin;
+//勝利フラッグ(自分が勝ったら1)
+int isWin=0;
 
 int main(void) {
 	
@@ -115,14 +113,14 @@ int main(void) {
 		
 	}else{
 		if(player_number==1){		//自分が先行の時、相手の手は2だから
-			board[bx-1][by-1]=enemy_number;
+			board[by-1][bx-1]=enemy_number;
 		}else{
-			board[bx-1][by-1]=enemy_number;
+			board[by-1][bx-1]=enemy_number;
 		}
 
 		//禁じ手判定のプログラム
 		//int end_flag = 0;
-		if(board[bx-1][by-1] == 1){ //相手先行で、手を置いた時
+		if(board[by-1][bx-1] == 1){ //相手先行で、手を置いた時
 			if(forbidden_hand_judgement(board) > 0){
 				printf("It is forbidden_hand!");
 				puts("I am Winner!!");
@@ -143,9 +141,9 @@ int main(void) {
 	        printf("%2d",i);        
 	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
 	            
-		    if(board[j-1][i-1]==0) printf(" -");
-		    if(board[j-1][i-1]==1) printf(" o");
-		    if(board[j-1][i-1]==2) printf(" x");
+		    if(board[i-1][j-1]==0) printf(" -");
+		    if(board[i-1][j-1]==1) printf(" o");
+		    if(board[i-1][j-1]==2) printf(" x");
 
 	        }
 	        puts("");
@@ -154,7 +152,7 @@ int main(void) {
 
 		//点数付けした盤面を出力する(杉村)
 		printf("SCOREBOARD(1stPlayer)");
-		int i=0;
+		i=0;
 	    printf("  ");
 	    for(i = 1; i < BOARD_SQUARE+1; i++ ){
 	        printf("%2d",i);
@@ -162,7 +160,7 @@ int main(void) {
 	    puts("");
 
 
-		int j=0;
+		j=0;
 		for(i = 1; i < BOARD_SQUARE+1; i++ ){        
 	        printf("%2d",i);        
 	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
@@ -173,7 +171,7 @@ int main(void) {
 
 		//点数付けした盤面を出力する(杉村)
 		printf("SCOREBOARD(2ndPlayer)");
-		int i=0;
+		i=0;
 	    printf("  ");
 	    for(i = 1; i < BOARD_SQUARE+1; i++ ){
 	        printf("%2d",i);
@@ -181,7 +179,7 @@ int main(void) {
 	    puts("");
 
 
-		int j=0;
+		j=0;
 		for(i = 1; i < BOARD_SQUARE+1; i++ ){        
 	        printf("%2d",i);        
 	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
@@ -211,9 +209,9 @@ int main(void) {
 		
 	}else{
 		if(player_number==1){		//自分が先行の時、相手の手は2だから
-			board[bx-1][by-1]=enemy_number;
+			board[by-1][bx-1]=enemy_number;
 		}else{
-			board[bx-1][by-1]=enemy_number;
+			board[by-1][bx-1]=enemy_number;
 		}
 		
 		i=0;
@@ -228,9 +226,9 @@ int main(void) {
 	        printf("%2d",i);        
 	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
 	            
-		    if(board[j-1][i-1]==0) printf(" -");
-		    if(board[j-1][i-1]==1) printf(" o");
-		    if(board[j-1][i-1]==2) printf(" x");
+		    if(board[i-1][j-1]==0) printf(" -");
+		    if(board[i-1][j-1]==1) printf(" o");
+		    if(board[i-1][j-1]==2) printf(" x");
 
 	        }
 	        puts("");
@@ -238,7 +236,7 @@ int main(void) {
 
 		//点数付けした盤面を出力する(杉村)
 		printf("SCOREBOARD(1stPlayer)");
-		int i=0;
+		i=0;
 	    printf("  ");
 	    for(i = 1; i < BOARD_SQUARE+1; i++ ){
 	        printf("%2d",i);
@@ -246,18 +244,18 @@ int main(void) {
 	    puts("");
 
 
-		int j=0;
+		j=0;
 		for(i = 1; i < BOARD_SQUARE+1; i++ ){        
 	        printf("%2d",i);        
 	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
-				printf("%d", scoreBoard[j-1][i-1][0]);
+				printf("%d", scoreBoard[i-1][j-1][0]);
 	        }
 	        puts("");
 	    }
 
 		//点数付けした盤面を出力する(杉村)
 		printf("SCOREBOARD(2ndPlayer)");
-		int i=0;
+		i=0;
 	    printf("  ");
 	    for(i = 1; i < BOARD_SQUARE+1; i++ ){
 	        printf("%2d",i);
@@ -265,11 +263,11 @@ int main(void) {
 	    puts("");
 
 
-		int j=0;
+		j=0;
 		for(i = 1; i < BOARD_SQUARE+1; i++ ){        
 	        printf("%2d",i);        
 	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
-				printf("%d", scoreBoard[j-1][i-1][1]);
+				printf("%d", scoreBoard[i-1][j-1][1]);
 	        }
 	        puts("");
 	    }
@@ -321,32 +319,32 @@ void boardScoring(){
 	int sx,sy;
 	int cd, cb;
 	int checkBoard[9];
-	int cdIni[4]={
+	int cdIni[4][2]={
 		{0, -4},	//縦
 		{-4, 0},	//横
 		{-4, -4},	//右下がり斜め
 		{4, -4}		//右上がり斜め
-	}
-	int cdGap[4]={
+	};
+	int cdGap[4][2]={
 		{0, 1},		//縦
 		{1, 0},		//横
 		{1, 1},		//右下がり斜め
 		{-1, 1}		//右上がり斜め
-	}
+	};
 	for(sy=0;sy<BOARD_SQUARE;sy++){
 		for(sx=0;sx<BOARD_SQUARE;sx++){
-			if(board[sx][sy]==0){		//石がおかれていないとき、４方向を見る
+			if(board[sy][sx]==0){		//石がおかれていないとき、４方向を見る
 				for(cd=0;cd<4;cd++){
 					int tempX=sx+cdIni[cd][0];
 					int tempY=sy+cdIni[cd][1];
 					for(cb=0;cb<9;cb++){
-						checkBoard[cb]=board[tempX][tempY];		//checkBoardに一方向の盤の情報を格納
+						checkBoard[cb]=board[tempY][tempX];		//checkBoardに一方向の盤の情報を格納
 						tempX+=cdGap[cd][0];
 						tempY+=cdGap[cd][1];
 					}
 					//スコアを加算して仮の盤面に格納する
-					scoreBoard[sx][sy][player_number-1]+=boardScore(checkBoard[], player_number);
-					scoreBoard[sx][sy][enemy_number-1]+=boardScore(checkBoard[], enemy_number);
+					scoreBoard[sy][sx][player_number-1]+=boardScore(checkBoard[], player_number);
+					scoreBoard[sy][sx][enemy_number-1]+=boardScore(checkBoard[], enemy_number);
 				}
 			}
 		}
@@ -359,7 +357,7 @@ int boardScore(int checkBoard[], int whichPlayer){
 	int bs;
 	int tempScore=0;
 	//先行のプレイヤー(黒，1)のアルゴリズムの手をすべて羅列する(向きの逆も含む)
-	int firstPatternEx[35]={
+	int firstPatternEx[35][8]={
 		{0,1,1,1,1,1},
 		{1,0,1,1,1,1,0},
 		{2,0,1,1,1,2},
@@ -395,9 +393,9 @@ int boardScore(int checkBoard[], int whichPlayer){
 		{6,2,0,1,0,1,0,2},
 		{6,2,0,1,1,0,0,2},
 		{6,2,0,0,1,1,0,2}
-	}
+	};
 	//後攻のプレイヤー(白，2)のアルゴリズムの手をすべて羅列する(向きの逆も含む)
-	int secondPatternEx[35]={
+	int secondPatternEx[35][8]={
 		{0,2,2,2,2,2},
 		{1,0,2,2,2,2,0},
 		{2,0,2,2,2,1},
@@ -433,8 +431,8 @@ int boardScore(int checkBoard[], int whichPlayer){
 		{6,1,0,2,0,2,0,1},
 		{6,1,0,2,2,0,0,1},
 		{6,1,0,0,2,2,0,1}
-	}
-	int patternScore[7]={100, 80, 70, 60, 50, 40, 30}
+	};
+	int patternScore[7]={100, 80, 70, 60, 50, 40, 30};
 	checkStr[] = convertInt(checkBoard[]);
 	for(bs=0;bs<35;bs++){
 		if(whichPlayer==1){		//先行のプレイヤーの点数を知りたいとき
@@ -452,7 +450,7 @@ int boardScore(int checkBoard[], int whichPlayer){
 }
 
 //intの配列をcharに変換する
-char convertInt(int array[]){
+char convertInt(array[]){
 	int arrayNumber = sizeof array / sizeof array[0];
 	char str[arrayNumber+1];
 	str[arrayNumber]='\0';
@@ -460,7 +458,7 @@ char convertInt(int array[]){
 	for(ci=0;ci<arrayNumber;ci++){
 		str[ci]=(char)array[ci];
 	}
-	return str[];
+	return str;
 }
 
 //禁じ手判定の関数
