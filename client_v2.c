@@ -13,95 +13,9 @@ int split(char *dst[], char *src, char delim);
 //盤面の情報を記録しておく配列
 int board[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
 
-int main(void) {
-	
-	char *dst[10];		//bufferを分割した文字列を格納する
-	int count;			//分割した文字数を格納する
-	int bx, by;		//ボードに格納する座標を一時的に記録する
-  
-	
-	//接続するサーバの情報の構造体を用意
-
-	struct sockaddr_in dest;
-
-	memset(&dest, 0, sizeof(dest));
-
-	//サーバの情報を入力
-
-	printf("アドレスを入力してください\n");
-
-
-	char destination[32];  //アドレス
-
-	scanf("%s", destination);
-
-	
-	printf("ポート番号を入力してください\n");
-
-	int port;  //アドレス
-
-	scanf("%d", &port);
-
-
-	dest.sin_port = htons(port);  //ポート番号
-
-	dest.sin_family = AF_INET;
-
-	dest.sin_addr.s_addr = inet_addr(destination);
-
-
-
-	//ソケット通信の準備・生成
-
-	WSADATA data;
-
-	WSAStartup(MAKEWORD(2, 0), &data);
-
-	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
-
-
-
-	//サーバへの接続
-
-	if (connect(s, (struct sockaddr *) &dest, sizeof(dest))) {
-
-		printf("%sに接続できませんでした\n", destination);
-
-		return -1;
-
-	}
-
-	printf("%sに接続しました\n", destination);
-
-  while(1){
-	char buffer[1024];
-	int i,j;
-
-	//サーバからデータを受信
-
-	recv(s, buffer, 1024, 0);
-
-	printf("→ %s\n\n", buffer);
-
-	//サーバーからの受信情報(buffer)をboard配列に挿入する
-	count = split(dst, buffer, ',');
-	
-	bx=atoi(dst[0]);
-	by=atoi(dst[1]);
-	
-	if(bx==0||by==0){
-		
-	}else{
-		if(port==12345){		//自分が先行の時、相手の手は2だから
-			board[bx-1][by-1]=2;
-		}else{
-			board[bx-1][by-1]=1;
-		}
-
-		//禁じ手判定のプログラム
-		int end_flag = 0;
-		if(board[bx-1][by-1] == 1){ //相手先行で、手を置いた時
-			//三三禁
+//禁じ手判定の関数
+int forbidden_hand_judgement(int board[BOARD_SQUARE][BOARD_SQUARE]){
+	//三三禁
 			char xsigns[8]="++0-";	//対象座標から八方への走査に必要な符号
 			char ysigns[8]="0+++";
 
@@ -210,30 +124,124 @@ int main(void) {
 
 						if(yon_counter == 2) {	//四四禁があれば
 							puts("It is forbidden hand!:yonyonkin");
-							end_flag = 1;
+							//end_flag = 1;
+							return 1;
 							break;	//禁じ手のプログラムを終了
 						}else if(san_counter == 2 && yon_counter == 0) {	//三三禁があれば
 							puts("It is forbidden hand!:sansankin");
-							end_flag = 1;
+							//end_flag = 1;
+							return 1;
 							break;	//禁じ手のプログラムを終了
 						}else if(choren_flag == 1){ //長連があれあば
 							puts("It is forbidden hand!:choren");
-							end_flag = 1;
+							//end_flag = 1;
+							return 1;
 							break;	//禁じ手のプログラムを終了
 						}
 					}else{
 						
 					}
 
-					if(end_flag) break;
+					//if(end_flag) break;
 
 				}
-					if(end_flag) break;
+					//if(end_flag) break;
 			}
-			if(end_flag){
-				puts("I am Winner!!");
-				while(1);
-			}
+			// if(end_flag){
+			// 	puts("I am Winner!!");
+			// 	while(1);
+			// }
+}
+
+int main(void) {
+	
+	char *dst[10];		//bufferを分割した文字列を格納する
+	int count;			//分割した文字数を格納する
+	int bx, by;		//ボードに格納する座標を一時的に記録する
+  
+	
+	//接続するサーバの情報の構造体を用意
+
+	struct sockaddr_in dest;
+
+	memset(&dest, 0, sizeof(dest));
+
+	//サーバの情報を入力
+
+	printf("アドレスを入力してください\n");
+
+
+	char destination[32];  //アドレス
+
+	scanf("%s", destination);
+
+	
+	printf("ポート番号を入力してください\n");
+
+	int port;  //アドレス
+
+	scanf("%d", &port);
+
+
+	dest.sin_port = htons(port);  //ポート番号
+
+	dest.sin_family = AF_INET;
+
+	dest.sin_addr.s_addr = inet_addr(destination);
+
+
+
+	//ソケット通信の準備・生成
+
+	WSADATA data;
+
+	WSAStartup(MAKEWORD(2, 0), &data);
+
+	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
+
+
+
+	//サーバへの接続
+
+	if (connect(s, (struct sockaddr *) &dest, sizeof(dest))) {
+
+		printf("%sに接続できませんでした\n", destination);
+
+		return -1;
+
+	}
+
+	printf("%sに接続しました\n", destination);
+
+  while(1){
+	char buffer[1024];
+	int i,j;
+
+	//サーバからデータを受信
+
+	recv(s, buffer, 1024, 0);
+
+	printf("→ %s\n\n", buffer);
+
+	//サーバーからの受信情報(buffer)をboard配列に挿入する
+	count = split(dst, buffer, ',');
+	
+	bx=atoi(dst[0]);
+	by=atoi(dst[1]);
+	
+	if(bx==0||by==0){
+		
+	}else{
+		if(port==12345){		//自分が先行の時、相手の手は2だから
+			board[bx-1][by-1]=2;
+		}else{
+			board[bx-1][by-1]=1;
+		}
+
+		//禁じ手判定のプログラム
+		int end_flag = 0;
+		if(board[bx-1][by-1] == 1){ //相手先行で、手を置いた時
+			if(forbidden_hand_judgement(board) > 0) printf("It is forbidden_hand!");
 		} 
 		
 	    int i=0;
