@@ -56,16 +56,20 @@ int forbidden_hand_judgement(int board[BOARD_SQUARE][BOARD_SQUARE]){
 							int black_counter = 0;	//対象の座標を含む直線上にある先攻の手を数えるもの
 							int san_reach_flag = 0; //三が一つ見つかった時点でこのフラグを１にする
 							int yon_reach_flag = 0;
+							int white_in_plus_flag = 0;
+							int white_in_minus_flag = 0;
 
 							for(int jm = 0; jm < 4; jm++){ //対象座標から三々禁となりうる直線上の範囲を走査
 								xweight += xvector;	//対象座標が進む向きと大きさを決定
 								yweight += yvector;
 	
-								if(board[mj-1+xweight][ki-1+yweight] == 1){	//進んだ先の座標が先攻（相手）の手であれば-(*)
+								if(board[mj-1+xweight][ki-1+yweight] == 1 && white_in_plus_flag == 0){	//進んだ先の座標が先攻（相手）の手であれば-(*)
 									black_counter++; //対象の座標を含む直線上にある先攻の手をカウント
 									xmax = mj-1+xweight; //その手（座標）を最大座標として保存
 									ymax = ki-1+yweight;
-								} 
+								} else if(board[mj-1+xweight][ki-1+yweight] == 2){
+									white_in_plus_flag = 1;
+								}
 
 								if(black_counter == 2 && san_reach_flag == 0){	//対象座標の他に直線上にある先攻の手が２つあれば
 									san_counter++; //三々禁となりうる三をカウント
@@ -90,10 +94,12 @@ int forbidden_hand_judgement(int board[BOARD_SQUARE][BOARD_SQUARE]){
 									}
 								} 
 
-								if(board[mj-1-xweight][ki-1-yweight] == 1){ //（*)とは反対向きに進んだ先の座標が先攻（相手）の手であれば
+								if(board[mj-1-xweight][ki-1-yweight] == 1&& white_in_minus_flag == 0){ //（*)とは反対向きに進んだ先の座標が先攻（相手）の手であれば
 									black_counter++;	//対象の座標を含む直線上にある先攻の手をカウント
 									xmin = mj-1-xweight;	//その手（座標）を最小座標として保存
 									ymin = ki-1-yweight;
+								}else if(board[mj-1+xweight][ki-1+yweight] == 2){
+									white_in_minus_flag = 1;
 								}
 
 								if(black_counter == 2 && san_reach_flag == 0){	//対象座標の他に直線上にある先攻の手が２つあれば
@@ -239,9 +245,13 @@ int main(void) {
 		}
 
 		//禁じ手判定のプログラム
-		int end_flag = 0;
+		//int end_flag = 0;
 		if(board[bx-1][by-1] == 1){ //相手先行で、手を置いた時
-			if(forbidden_hand_judgement(board) > 0) printf("It is forbidden_hand!");
+			if(forbidden_hand_judgement(board) > 0){
+				printf("It is forbidden_hand!");
+				puts("I am Winner!!");
+				while(1);
+			} 
 		} 
 		
 	    int i=0;
