@@ -18,6 +18,7 @@ int forbidden_hand_judgement(int board[BOARD_SQUARE][BOARD_SQUARE])
 //盤面の情報を記録しておく配列
 int board[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
 //最適な打ち手を探すために盤面のパターンによって行う点数付けを記録する盤面．自分と敵の2つのスコアボードを保持する．
+//先行は0番目に，後攻は1番目に格納する
 int scoreBoard[BOARD_SQUARE][BOARD_SQUARE][2] = {{0}};
 
 //自分が先行か後攻かを記録する(先行(黒)→1, 後攻(白)→2)
@@ -152,7 +153,7 @@ int main(void) {
 
 
 		//点数付けした盤面を出力する(杉村)
-		printf("SCOREBOARD");
+		printf("SCOREBOARD(1stPlayer)");
 		int i=0;
 	    printf("  ");
 	    for(i = 1; i < BOARD_SQUARE+1; i++ ){
@@ -165,7 +166,26 @@ int main(void) {
 		for(i = 1; i < BOARD_SQUARE+1; i++ ){        
 	        printf("%2d",i);        
 	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
-				printf("%d", scoreBoard[j-1][i-1]);
+				printf("%d", scoreBoard[j-1][i-1][0]);
+	        }
+	        puts("");
+	    }
+
+		//点数付けした盤面を出力する(杉村)
+		printf("SCOREBOARD(2ndPlayer)");
+		int i=0;
+	    printf("  ");
+	    for(i = 1; i < BOARD_SQUARE+1; i++ ){
+	        printf("%2d",i);
+	    }
+	    puts("");
+
+
+		int j=0;
+		for(i = 1; i < BOARD_SQUARE+1; i++ ){        
+	        printf("%2d",i);        
+	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
+				printf("%d", scoreBoard[j-1][i-1][1]);
 	        }
 	        puts("");
 	    }
@@ -217,7 +237,7 @@ int main(void) {
 	    }
 
 		//点数付けした盤面を出力する(杉村)
-		printf("SCOREBOARD");
+		printf("SCOREBOARD(1stPlayer)");
 		int i=0;
 	    printf("  ");
 	    for(i = 1; i < BOARD_SQUARE+1; i++ ){
@@ -230,7 +250,26 @@ int main(void) {
 		for(i = 1; i < BOARD_SQUARE+1; i++ ){        
 	        printf("%2d",i);        
 	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
-				printf("%d", scoreBoard[j-1][i-1]);
+				printf("%d", scoreBoard[j-1][i-1][0]);
+	        }
+	        puts("");
+	    }
+
+		//点数付けした盤面を出力する(杉村)
+		printf("SCOREBOARD(2ndPlayer)");
+		int i=0;
+	    printf("  ");
+	    for(i = 1; i < BOARD_SQUARE+1; i++ ){
+	        printf("%2d",i);
+	    }
+	    puts("");
+
+
+		int j=0;
+		for(i = 1; i < BOARD_SQUARE+1; i++ ){        
+	        printf("%2d",i);        
+	        for(j = 1; j < BOARD_SQUARE+1; j++ ){
+				printf("%d", scoreBoard[j-1][i-1][1]);
 	        }
 	        puts("");
 	    }
@@ -277,7 +316,7 @@ int split(char *dst[], char *src, char delim){
 }
 
 //一回置き終わったら点数を消さないとあかんかも？（一個前の手を使うならいける)
-//盤面を全面探索して，まだ石が置かれていない場所の点数付けをする(点数は加算していく)．その値は，２次元配列scoreBoardに記録する．
+//盤面を全面探索して，まだ石が置かれていない場所の点数付けをする(点数は加算していく)．その値は，3次元配列scoreBoardに記録する．
 void boardScoring(){
 	int sx,sy;
 	int cd, cb;
@@ -306,8 +345,8 @@ void boardScoring(){
 						tempY+=cdGap[cd][1];
 					}
 					//スコアを加算して仮の盤面に格納する
-					scoreBoard[sx][sy][player_number]+=boardScore(checkBoard[], player_number);
-					scoreBoard[sx][sy][enemy_number]+=boardScore(checkBoard[], enemy_number);
+					scoreBoard[sx][sy][player_number-1]+=boardScore(checkBoard[], player_number);
+					scoreBoard[sx][sy][enemy_number-1]+=boardScore(checkBoard[], enemy_number);
 				}
 			}
 		}
