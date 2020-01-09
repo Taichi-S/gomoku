@@ -5,13 +5,13 @@
 
 #define BOARD_SQUARE 15
 
-//ƒvƒƒgƒ^ƒCƒvéŒ¾
+//ï¿½vï¿½ï¿½ï¿½gï¿½^ï¿½Cï¿½vï¿½éŒ¾
 int isDelimiter(char p, char delim);
 int split(char *dst[], char *src, char delim);
 void boardScoring();
-int matchingScore(int *checkBoard, int whichPlayer)
+int matchingScore(int *checkBoard, int whichPlayer);
 
-//æs‚ÌƒvƒŒƒCƒ„[(•C1)‚ÌƒAƒ‹ƒSƒŠƒYƒ€‚ÌŽè‚ð‚·‚×‚Ä—…—ñ‚·‚é(Œü‚«‚Ì‹t‚àŠÜ‚Þ)
+//ï¿½ï¿½sï¿½Ìƒvï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[(ï¿½ï¿½ï¿½C1)ï¿½ÌƒAï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½Yï¿½ï¿½ï¿½ÌŽï¿½ï¿½ï¿½ï¿½ï¿½×‚Ä—ï¿½ï¿½ñ‚·‚ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½Ì‹tï¿½ï¿½ï¿½Ü‚ï¿½)
 int firstPatternEx[35][8]={
 	{0,1,1,1,1,1},
 	{1,0,1,1,1,1,0},
@@ -49,7 +49,7 @@ int firstPatternEx[35][8]={
 	{6,2,0,1,1,0,0,2},
 	{6,2,0,0,1,1,0,2}
 };
-//ŒãU‚ÌƒvƒŒƒCƒ„[(”’C2)‚ÌƒAƒ‹ƒSƒŠƒYƒ€‚ÌŽè‚ð‚·‚×‚Ä—…—ñ‚·‚é(Œü‚«‚Ì‹t‚àŠÜ‚Þ)
+//ï¿½ï¿½Uï¿½Ìƒvï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[(ï¿½ï¿½ï¿½C2)ï¿½ÌƒAï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½Yï¿½ï¿½ï¿½ÌŽï¿½ï¿½ï¿½ï¿½ï¿½×‚Ä—ï¿½ï¿½ñ‚·‚ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½Ì‹tï¿½ï¿½ï¿½Ü‚ï¿½)
 int secondPatternEx[35][8]={
 	{0,2,2,2,2,2},
 	{1,0,2,2,2,2,0},
@@ -89,25 +89,25 @@ int secondPatternEx[35][8]={
 };
 int patternScore[7]={100, 80, 70, 60, 50, 40, 30};
 
-//”Õ–Ê‚Ìî•ñ‚ð‹L˜^‚µ‚Ä‚¨‚­”z—ñ
+//ï¿½Õ–Ê‚Ìï¿½ï¿½ï¿½ï¿½Lï¿½^ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½
 int board[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
-//Å“K‚È‘Å‚¿Žè‚ð’T‚·‚½‚ß‚É”Õ–Ê‚Ìƒpƒ^[ƒ“‚É‚æ‚Á‚Äs‚¤“_”•t‚¯‚ð‹L˜^‚·‚é”Õ–ÊDŽ©•ª‚Æ“G‚Ì2‚Â‚ÌƒXƒRƒAƒ{[ƒh‚ð•ÛŽ‚·‚éD
-//æs‚Í0”Ô–Ú‚ÉCŒãU‚Í1”Ô–Ú‚ÉŠi”[‚·‚é
+//ï¿½Å“Kï¿½È‘Å‚ï¿½ï¿½ï¿½ï¿½Tï¿½ï¿½ï¿½ï¿½ï¿½ß‚É”Õ–Ê‚Ìƒpï¿½^ï¿½[ï¿½ï¿½ï¿½É‚ï¿½ï¿½ï¿½Äsï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½^ï¿½ï¿½ï¿½ï¿½Õ–ÊDï¿½ï¿½ï¿½ï¿½ï¿½Æ“Gï¿½ï¿½2ï¿½Â‚ÌƒXï¿½Rï¿½Aï¿½{ï¿½[ï¿½hï¿½ï¿½ÛŽï¿½ï¿½ï¿½ï¿½ï¿½D
+//ï¿½ï¿½sï¿½ï¿½0ï¿½Ô–Ú‚ÉCï¿½ï¿½Uï¿½ï¿½1ï¿½Ô–Ú‚ÉŠiï¿½[ï¿½ï¿½ï¿½ï¿½
 int scoreBoard[BOARD_SQUARE][BOARD_SQUARE][2] = {{0}};
 
-//Ž©•ª‚ªæs‚©ŒãU‚©‚ð‹L˜^‚·‚é(æs(•)¨1, ŒãU(”’)¨2)
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½^ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½s(ï¿½ï¿½)ï¿½ï¿½1, ï¿½ï¿½U(ï¿½ï¿½)ï¿½ï¿½2)
 int player_number=1;
 int enemy_number=2;
 
-//Ÿ—˜ƒtƒ‰ƒbƒO(Ž©•ª‚ªŸ‚Á‚½‚ç1)
+//ï¿½ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½bï¿½O(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1)
 int isWin=0;
 
 int main(void) {
     int i,j;
-    //”Õ–Ê‚ð0,1,2‚Åƒ‰ƒ“ƒ_ƒ€‚É–„‚ß‚é
+    //ï¿½Õ–Ê‚ï¿½0,1,2ï¿½Åƒï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½É–ï¿½ï¿½ß‚ï¿½
     for(i = 0; i < BOARD_SQUARE; i++ ){
         for(j=0;j<BOARD_SQUARE; j++){
-            board[i][j]=rand() % 3;     //0,1,2 ‚Ì—”‚ð”­¶
+            board[i][j]=rand() % 3;     //0,1,2 ï¿½Ì—ï¿½ï¿½ï¿½ï¿½ð”­ï¿½
         }
     }
     
@@ -134,7 +134,7 @@ int main(void) {
 
     boardScoring();
 
-    //“_”•t‚¯‚µ‚½”Õ–Ê‚ðo—Í‚·‚é(™‘º)
+    //ï¿½_ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ–Ê‚ï¿½ï¿½oï¿½Í‚ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½)
     printf("SCOREBOARD(1stPlayer)");
     i=0;
     printf("  ");
@@ -153,7 +153,7 @@ int main(void) {
         puts("");
     }
 
-    //“_”•t‚¯‚µ‚½”Õ–Ê‚ðo—Í‚·‚é(™‘º)
+    //ï¿½_ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ–Ê‚ï¿½ï¿½oï¿½Í‚ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½)
     printf("SCOREBOARD(2ndPlayer)");
     i=0;
     printf("  ");
@@ -205,57 +205,58 @@ int split(char *dst[], char *src, char delim){
   return count;
 }
 
-//ˆê‰ñ’u‚«I‚í‚Á‚½‚ç“_”‚ðÁ‚³‚È‚¢‚Æ‚ ‚©‚ñ‚©‚àHiˆêŒÂ‘O‚ÌŽè‚ðŽg‚¤‚È‚ç‚¢‚¯‚é)
-//”Õ–Ê‚ð‘S–Ê’Tõ‚µ‚ÄC‚Ü‚¾Î‚ª’u‚©‚ê‚Ä‚¢‚È‚¢êŠ‚Ì“_”•t‚¯‚ð‚·‚é(“_”‚Í‰ÁŽZ‚µ‚Ä‚¢‚­)D‚»‚Ì’l‚ÍC3ŽŸŒ³”z—ñscoreBoard‚É‹L˜^‚·‚éD
+//ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½ñ‚©‚ï¿½ï¿½Hï¿½iï¿½ï¿½Â‘Oï¿½ÌŽï¿½ï¿½ï¿½gï¿½ï¿½ï¿½È‚ç‚¢ï¿½ï¿½ï¿½ï¿½)
+//ï¿½Õ–Ê‚ï¿½Sï¿½Ê’Tï¿½ï¿½ï¿½ï¿½ï¿½ÄCï¿½Ü‚ï¿½ï¿½Î‚ï¿½ï¿½uï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½êŠï¿½Ì“_ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½_ï¿½ï¿½ï¿½Í‰ï¿½ï¿½Zï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½)ï¿½Dï¿½ï¿½ï¿½Ì’lï¿½ÍC3ï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½scoreBoardï¿½É‹Lï¿½^ï¿½ï¿½ï¿½ï¿½D
 void boardScoring(){
 	int sx,sy;
 	int cd, cb;
 	int checkBoard[9];
 	int cdIni[4][2]={
-		{0, -4},	//c
-		{-4, 0},	//‰¡
-		{-4, -4},	//‰E‰º‚ª‚èŽÎ‚ß
-		{4, -4}		//‰Eã‚ª‚èŽÎ‚ß
+		{0, -4},	//ï¿½c
+		{-4, 0},	//ï¿½ï¿½
+		{-4, -4},	//ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î‚ï¿½
+		{4, -4}		//ï¿½Eï¿½ã‚ªï¿½ï¿½Î‚ï¿½
 	};
 	int cdGap[4][2]={
-		{0, 1},		//c
-		{1, 0},		//‰¡
-		{1, 1},		//‰E‰º‚ª‚èŽÎ‚ß
-		{-1, 1}		//‰Eã‚ª‚èŽÎ‚ß
+		{0, 1},		//ï¿½c
+		{1, 0},		//ï¿½ï¿½
+		{1, 1},		//ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î‚ï¿½
+		{-1, 1}		//ï¿½Eï¿½ã‚ªï¿½ï¿½Î‚ï¿½
 	};
 	for(sy=0;sy<BOARD_SQUARE;sy++){
 		for(sx=0;sx<BOARD_SQUARE;sx++){
-			if(board[sy][sx]==0){		//Î‚ª‚¨‚©‚ê‚Ä‚¢‚È‚¢‚Æ‚«A‚S•ûŒü‚ðŒ©‚é
+			if(board[sy][sx]==0){		//ï¿½Î‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½Æ‚ï¿½ï¿½Aï¿½Sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				for(cd=0;cd<4;cd++){
 					int tempX=sx+cdIni[cd][0];
 					int tempY=sy+cdIni[cd][1];
 					for(cb=0;cb<9;cb++){
-						checkBoard[cb]=board[tempY][tempX];		//checkBoard‚Éˆê•ûŒü‚Ì”Õ‚Ìî•ñ‚ðŠi”[
+						checkBoard[cb]=board[tempY][tempX];		//checkBoardï¿½Éˆï¿½ï¿½ï¿½ï¿½ï¿½Ì”Õ‚Ìï¿½ï¿½ï¿½ï¿½iï¿½[
 						tempX+=cdGap[cd][0];
 						tempY+=cdGap[cd][1];
 					}
-					//ƒXƒRƒA‚ð‰ÁŽZ‚µ‚Ä‰¼‚Ì”Õ–Ê‚ÉŠi”[‚·‚é
+					//ï¿½Xï¿½Rï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½Ä‰ï¿½ï¿½Ì”Õ–Ê‚ÉŠiï¿½[ï¿½ï¿½ï¿½ï¿½
 					scoreBoard[sy][sx][player_number-1]+=matchingScore(checkBoard, player_number);
-					scoreBoard[sy][sx][enemy_number-1]+=boardScore(checkBoard, enemy_number);
+					scoreBoard[sy][sx][enemy_number-1]+=matchingScore(checkBoard, enemy_number);
 				}
 			}
 		}
 	}
 }
 
-//ƒ}ƒbƒ`ƒ“ƒO‚µ‚½‚©‚Ç‚¤‚©+ƒ}ƒbƒ`ƒ“ƒO‚µ‚½ƒpƒ^[ƒ“‚Æ‘ÎÛ”z—ñ‚Ì0‚ªˆê’v‚µ‚Ä‚¢‚é‚©+‚»‚ê‚É‚æ‚è“_”‚ð‰Á“_‚·‚é
-//êŠˆË‘¶‚â‚©‚çCƒ}ƒbƒ`ƒ“ƒO‚¾‚¯‚Ìƒƒ\ƒbƒh‚É‚Í‚Å‚«‚È‚¢
-//1‚Â‚Ì•ûŒü(—v‘f”9‚ÌˆêŽŸ”z—ñ)‚É‘Î‚µ‚ÄC35Ží—Þ‘S‚Ä‚Ìƒpƒ^[ƒ“‚ð’Tõ‚·‚é
+//ï¿½}ï¿½bï¿½`ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½+ï¿½}ï¿½bï¿½`ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½pï¿½^ï¿½[ï¿½ï¿½ï¿½Æ‘ÎÛ”zï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©+ï¿½ï¿½ï¿½ï¿½É‚ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½
+//ï¿½êŠï¿½Ë‘ï¿½ï¿½â‚©ï¿½ï¿½Cï¿½}ï¿½bï¿½`ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½Ìƒï¿½ï¿½\ï¿½bï¿½hï¿½É‚Í‚Å‚ï¿½ï¿½È‚ï¿½
+//1ï¿½Â‚Ì•ï¿½ï¿½ï¿½(ï¿½vï¿½fï¿½ï¿½9ï¿½ÌˆêŽŸï¿½zï¿½ï¿½)ï¿½É‘Î‚ï¿½ï¿½ÄC35ï¿½ï¿½Þ‘Sï¿½Ä‚Ìƒpï¿½^ï¿½[ï¿½ï¿½ï¿½ï¿½Tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 int matchingScore(int *checkBoard, int whichPlayer){
-	int pNum=lenPEX-1;
-	int mNum=10-pNum;
 	int mi, mj;
 	int ms;
 	int sumScore=0;
 	if(whichPlayer==1){
 		for(ms=0;ms<35;ms++){
+            int lenPEX = sizeof firstPatternEx[ms] / sizeof firstPatternEx[ms][0];
+            int pNum = lenPEX-1;
+            int mNum=10-pNum;
 			for(mi=0;mi<mNum;mi++){
-				//Œ©‚Ä‚éƒpƒ^[ƒ“‚Ì^‚ñ’†‚ª0‚Å‚Í‚È‚¢¨‰ÁŽZ‚µ‚È‚¢‚©‚ç”ò‚Î‚·
+				//ï¿½ï¿½ï¿½Ä‚ï¿½pï¿½^ï¿½[ï¿½ï¿½ï¿½Ì^ï¿½ñ’†‚ï¿½0ï¿½Å‚Í‚È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î‚ï¿½
 				if(firstPatternEx[ms][5-mi]!=0){
 					continue;
 				}
@@ -263,15 +264,18 @@ int matchingScore(int *checkBoard, int whichPlayer){
 					if(checkBoard[mi+mj]!=firstPatternEx[ms][mj+1]){
 						continue;
 					}
-				}//ÅŒã‚Ü‚Åƒ~ƒX‚È‚µ
+				}//ï¿½ÅŒï¿½Ü‚Åƒ~ï¿½Xï¿½È‚ï¿½
 				sumScore+=patternScore[firstPatternEx[ms][0]];
 			}
 		}
 	}
 	else{
 		for(ms=0;ms<35;ms++){
+            int lenPEX = sizeof secondPatternEx[ms] / sizeof secondPatternEx[ms][0];
+            int pNum = lenPEX-1;
+            int mNum=10-pNum;
 			for(mi=0;mi<mNum;mi++){
-				//Œ©‚Ä‚éƒpƒ^[ƒ“‚Ì^‚ñ’†‚ª0‚Å‚Í‚È‚¢¨‰ÁŽZ‚µ‚È‚¢‚©‚ç”ò‚Î‚·
+				//ï¿½ï¿½ï¿½Ä‚ï¿½pï¿½^ï¿½[ï¿½ï¿½ï¿½Ì^ï¿½ñ’†‚ï¿½0ï¿½Å‚Í‚È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î‚ï¿½
 				if(secondPatternEx[ms][5-mi]!=0){
 					continue;
 				}
@@ -279,7 +283,7 @@ int matchingScore(int *checkBoard, int whichPlayer){
 					if(checkBoard[mi+mj]!=secondPatternEx[ms][mj+1]){
 						continue;
 					}
-				}//ÅŒã‚Ü‚Åƒ~ƒX‚È‚µ
+				}//ï¿½ÅŒï¿½Ü‚Åƒ~ï¿½Xï¿½È‚ï¿½
 				sumScore+=patternScore[secondPatternEx[ms][0]];
 			}
 		}
