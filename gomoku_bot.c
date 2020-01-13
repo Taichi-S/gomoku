@@ -7,13 +7,18 @@
 
 #define BOARD_SQUARE 15
 
+typedef struct Map{
+    int x;
+    int y;
+    int score;
+}map;
 //scoring
-void boardScoring();
+void boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlayer,  int statusBoard[BOARD_SQUARE][BOARD_SQUARE]);
 int matchingScore(int *checkBoard, int whichPlayer, int putPlayer);
 void output_array(int *in, int len);
-void printScoreBoard(int whichPlayer);
+void printScoreBoard(int tmp_board[BOARD_SQUARE][BOARD_SQUARE]);
 void printBoard(void);
-
+void convert(map tmp_map[BOARD_SQUARE*BOARD_SQUARE], int scoreBoard[BOARD_SQUARE][BOARD_SQUARE]);
 //cotaro
 int isDelimiter(char p, char delim);
 int split(char *dst[], char *src, char delim);
@@ -21,15 +26,16 @@ int forbidden_hand_judgement(int bx, int by);
 
 //bot
 void gomokuBot(int array[2]);
+int getOpposite(int whichPlayer);
 
 // int board[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
 int board[BOARD_SQUARE][BOARD_SQUARE]={{0}};
-int scoreBoard[BOARD_SQUARE][BOARD_SQUARE][2] = {{0}};
+//int scoreBoard[BOARD_SQUARE][BOARD_SQUARE][2] = {{0}};
 int player_number;
 int enemy_number;
 int first_player = 1;//先攻
 int second_player = 2;//後攻
-
+int start_count = 0;
 int main(void) {
     char *dst[10]; //bufferを分割した文字列を格納する
 	int count;	 //分割した文字数を格納する
@@ -93,7 +99,7 @@ int main(void) {
 
 	printf("you could connect to %s\n", destination);
 
-    int start_count = 0;
+    
     //以下bot
     while (1)
 	{
@@ -109,8 +115,8 @@ int main(void) {
 		    scanf("%s", message);
 
 		    send(s, message, strlen(message), 0);
-
             start_count++;
+            
             continue;
         }
 		//サーバーからの受信情報(buffer)をboard配列に挿入する
@@ -150,8 +156,8 @@ int main(void) {
 		}
 		else
 		{
-				board[by - 1][bx - 1] = player_number;
-                printBoard();
+			board[by - 1][bx - 1] = player_number;
+            printBoard();
 		}
         char message[32];
         sprintf(message, "%d,%d", bx, by);
@@ -161,6 +167,7 @@ int main(void) {
 		// Windows でのソケットの終了
 		//closesocket(s);
 		//WSACleanup();
+        
 	}
     // printBoard();
 
@@ -172,11 +179,257 @@ int main(void) {
 }
 
 void gomokuBot(int array[2]){
-    int bx, by;
     
-   
-    *array = rand()%15+1;
-    *(array+1) = rand()%15+1;
+    int tmp_array[2];
+    if(player_number == second_player){
+        if(start_count==1){
+            start_count++;
+            *array = 9;
+            *(array+1) = 9;
+            return;
+        }
+        int tmp_board[BOARD_SQUARE][BOARD_SQUARE];
+        int tmp_i, tmp_j;
+
+    //配列のコピー
+        for(tmp_i=0; tmp_i<BOARD_SQUARE; tmp_i++){
+            for(tmp_j=0; tmp_j<BOARD_SQUARE; tmp_j++){
+                tmp_board[tmp_i][tmp_j] = board[tmp_i][tmp_j];
+            }
+        }
+
+        map tmp_map[BOARD_SQUARE*BOARD_SQUARE];
+        boardScoring(tmp_map, 1, player_number, tmp_board);
+        printf("%d,%d  score=%d\n", tmp_map[0].x, tmp_map[0].y, tmp_map[0].score);
+        printf("%d,%d  score=%d\n", tmp_map[1].x, tmp_map[1].y, tmp_map[1].score);
+        printf("%d,%d  score=%d\n", tmp_map[2].x, tmp_map[2].y, tmp_map[2].score);
+        printf("%d,%d  score=%d\n", tmp_map[3].x, tmp_map[3].y, tmp_map[3].score);
+        printf("%d,%d  score=%d\n", tmp_map[4].x, tmp_map[4].y, tmp_map[4].score);
+        *array = tmp_map[0].x;
+        *(array+1) = tmp_map[0].y;
+        return;
+    }else{
+        if(start_count==1){
+            start_count++;
+            *array = 8;
+            *(array+1) = 8;
+            return;
+        }
+        *array = rand()%15+1;
+        *(array+1) = rand()%15+1;
+        return;
+    }
+    
+}
+
+
+
+
+void boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlayer, int statusBoard[BOARD_SQUARE][BOARD_SQUARE]){
+
+    int tmp_board[BOARD_SQUARE][BOARD_SQUARE];
+    int tmp_i, tmp_j;
+
+    //配列のコピー
+    for(tmp_i=0; tmp_i<BOARD_SQUARE; tmp_i++){
+        for(tmp_j=0; tmp_j<BOARD_SQUARE; tmp_j++){
+            tmp_board[tmp_i][tmp_j] = statusBoard[tmp_i][tmp_j];
+        }
+    }
+
+    int scoreBoard[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
+	int sx,sy;
+	int cd, cb;
+	int checkBoard[9];
+	int cdIni[4][2]={
+		{0, -4},	
+		{-4, 0},
+		{-4, -4},
+		{4, -4}		
+	};
+	int cdGap[4][2]={
+		{0, 1},		
+		{1, 0},		
+		{1, 1},	
+		{-1, 1}		
+	};
+	for(sy=0;sy<BOARD_SQUARE;sy++){
+		for(sx=0;sx<BOARD_SQUARE;sx++){
+			if(tmp_board[sy][sx]==0){		
+                int tmp = 0;
+                //printf("x=%d, y=%d\n", sx, sy);
+				for(cd=0;cd<4;cd++){
+					int tempX=sx+cdIni[cd][0];
+					int tempY=sy+cdIni[cd][1];
+                    //printf("tempX=%d ,tempY=%d\n", tempX, tempY);
+					for(cb=0;cb<9;cb++){
+						if((tempY<0 || tempX<0) || (tempX>=15 || tempY>=15)){
+                            checkBoard[cb]=0;
+                        }else{
+                            checkBoard[cb]=board[tempY][tempX];	
+                        }
+						tempX+=cdGap[cd][0];
+						tempY+=cdGap[cd][1];
+					}
+					
+					//output_array(checkBoard, sizeof(checkBoard)/sizeof(int));
+					
+					scoreBoard[sy][sx]+=matchingScore(checkBoard, player_number, player_number);
+                    
+					//scoreBoard[sy][sx][enemy_number-1]+=matchingScore(checkBoard, enemy_number, enemy_number);
+				}
+			}
+		}
+	}
+    printScoreBoard(scoreBoard);
+    convert(tmp_map, scoreBoard);
+}
+void convert(map tmp_map[BOARD_SQUARE*BOARD_SQUARE], int score_board[BOARD_SQUARE][BOARD_SQUARE]){
+    map tmp_board[BOARD_SQUARE*BOARD_SQUARE];
+    int tmp_i, tmp_j;
+    for(tmp_i=0; tmp_i<BOARD_SQUARE; tmp_i++){
+        for(tmp_j=0; tmp_j<BOARD_SQUARE; tmp_j++){
+            tmp_map[BOARD_SQUARE*tmp_i + tmp_j].score = score_board[tmp_i][tmp_j];
+            tmp_map[BOARD_SQUARE*tmp_i + tmp_j].x = tmp_j+1;
+            tmp_map[BOARD_SQUARE*tmp_i + tmp_j].y = tmp_i+1;
+        }
+    }
+    int max;
+    int max_x, max_y;
+    for(tmp_i=0; tmp_i<BOARD_SQUARE*BOARD_SQUARE; tmp_i++){
+        
+        for(tmp_j=0; tmp_j<BOARD_SQUARE*BOARD_SQUARE-1; tmp_j++){
+            if(tmp_map[tmp_j].score<tmp_map[tmp_j+1].score){
+                map tmp;
+                tmp =tmp_map[tmp_j+1];
+                tmp_map[tmp_j+1] = tmp_map[tmp_j];
+                tmp_map[tmp_j] = tmp;
+            }
+        }
+    }
+
+}
+void output_array(int *in, int len){
+    int i;
+	for(i=0; i<len; i++){
+		printf("%d-",in[i]);
+	}
+	puts("");
+}
+
+
+int matchingScore(int *checkBoard, int whichPlayer, int putPlayer){
+	int mi, mj;
+	int cont=0;
+    int tmp=0;
+    checkBoard[4] = putPlayer;
+	
+	for(mi=0; mi<9; mi++){
+        if(checkBoard[mi]==whichPlayer){
+            cont++;
+        }else{
+            if(checkBoard[mi]==getOpposite(whichPlayer)){
+                cont--;
+            }
+            if(tmp<cont){
+                tmp=cont;
+            }
+            cont=0;
+        }
+    }
+    if(tmp<cont){
+        tmp=cont;
+    }
+    return tmp-1;
+}
+
+int getOpposite(int whichPlayer){
+    if(whichPlayer == player_number){
+        return enemy_number;
+    }else{
+        return player_number;
+    }
+}
+
+void printBoard(void){
+    int i,j;
+
+    i=0;
+    printf("  ");
+    for(i = 1; i < BOARD_SQUARE+1; i++ ){
+        printf("%2d",i);
+    }
+    puts("");
+
+
+    j=0;
+    for(i = 1; i < BOARD_SQUARE+1; i++ ){        
+        printf("%2d",i);        
+        for(j = 1; j < BOARD_SQUARE+1; j++ ){
+            
+        if(board[i-1][j-1]==0) printf(" -");
+        if(board[i-1][j-1]==1) printf(" o");
+        if(board[i-1][j-1]==2) printf(" x");
+
+        }
+        puts("");
+    }
+}
+
+void printScoreBoard(int tmp_board[BOARD_SQUARE][BOARD_SQUARE]){
+    printf("SCOREBOARD(Player)\n");
+    int i=0;
+    int j=0;
+    printf("  ");
+    for(i = 1; i < BOARD_SQUARE+1; i++ ){
+        printf("%2d",i);
+    }
+    puts("");
+
+
+    j=0;
+    for(i = 1; i < BOARD_SQUARE+1; i++ ){        
+        printf("%2d",i);        
+        for(j = 1; j < BOARD_SQUARE+1; j++ ){
+            printf("%2d", tmp_board[i-1][j-1]);
+        }
+        puts("");
+    }
+}
+
+
+int isDelimiter(char p, char delim)
+{
+	return p == delim;
+}
+
+int split(char *dst[], char *src, char delim)
+{
+	int count = 0;
+
+	for (;;)
+	{
+		while (isDelimiter(*src, delim))
+		{
+			src++;
+		}
+
+		if (*src == '\0')
+			break;
+
+		dst[count++] = src;
+
+		while (*src && !isDelimiter(*src, delim))
+		{
+			src++;
+		}
+
+		if (*src == '\0')
+			break;
+
+		*src++ = '\0';
+	}
+	return count;
 }
 
 int forbidden_hand_judgement(int bx, int by)
@@ -384,159 +637,4 @@ int forbidden_hand_judgement(int bx, int by)
 	// 	puts("I am Winner!!");
 	// 	while(1);
 	// }
-}
-
-void printBoard(void){
-    int i,j;
-
-    i=0;
-    printf("  ");
-    for(i = 1; i < BOARD_SQUARE+1; i++ ){
-        printf("%2d",i);
-    }
-    puts("");
-
-
-    j=0;
-    for(i = 1; i < BOARD_SQUARE+1; i++ ){        
-        printf("%2d",i);        
-        for(j = 1; j < BOARD_SQUARE+1; j++ ){
-            
-        if(board[i-1][j-1]==0) printf(" -");
-        if(board[i-1][j-1]==1) printf(" o");
-        if(board[i-1][j-1]==2) printf(" x");
-
-        }
-        puts("");
-    }
-}
-
-void printScoreBoard(int whichPlayer){
-    printf("SCOREBOARD(%dstPlayer)\n",whichPlayer);
-    int i=0;
-    int j=0;
-    printf("  ");
-    for(i = 1; i < BOARD_SQUARE+1; i++ ){
-        printf("%2d",i);
-    }
-    puts("");
-
-
-    j=0;
-    for(i = 1; i < BOARD_SQUARE+1; i++ ){        
-        printf("%2d",i);        
-        for(j = 1; j < BOARD_SQUARE+1; j++ ){
-            printf("%2d", scoreBoard[i-1][j-1][whichPlayer-1]);
-        }
-        puts("");
-    }
-}
-
-void boardScoring(){
-
-	int sx,sy;
-	int cd, cb;
-	int checkBoard[9];
-	int cdIni[4][2]={
-		{0, -4},	
-		{-4, 0},
-		{-4, -4},
-		{4, -4}		
-	};
-	int cdGap[4][2]={
-		{0, 1},		
-		{1, 0},		
-		{1, 1},	
-		{-1, 1}		
-	};
-	for(sy=0;sy<BOARD_SQUARE;sy++){
-		for(sx=0;sx<BOARD_SQUARE;sx++){
-			if(board[sy][sx]==0){		
-                //printf("x=%d, y=%d\n", sx, sy);
-				for(cd=0;cd<4;cd++){
-					int tempX=sx+cdIni[cd][0];
-					int tempY=sy+cdIni[cd][1];
-                    //printf("tempX=%d ,tempY=%d\n", tempX, tempY);
-					for(cb=0;cb<9;cb++){
-						if(tempY<0 | tempX<0){
-                            checkBoard[cb]=0;
-                        }else{
-                            checkBoard[cb]=board[tempY][tempX];	
-                        }
-						tempX+=cdGap[cd][0];
-						tempY+=cdGap[cd][1];
-					}
-					
-					//output_array(checkBoard, sizeof(checkBoard)/sizeof(int));
-					
-					scoreBoard[sy][sx][player_number-1]+=matchingScore(checkBoard, player_number, 1);
-					scoreBoard[sy][sx][enemy_number-1]+=matchingScore(checkBoard, enemy_number, 2);
-				}
-			}
-		}
-	}
-}
-void output_array(int *in, int len){
-    int i;
-	for(i=0; i<len; i++){
-		printf("%d-",in[i]);
-	}
-	puts("");
-}
-
-
-int matchingScore(int *checkBoard, int whichPlayer, int putPlayer){
-	int mi, mj;
-	int cont=0;
-    int tmp=0;
-    checkBoard[4] = putPlayer;
-	
-	for(mi=0; mi<9; mi++){
-        if(checkBoard[mi]==whichPlayer){
-            cont++;
-        }else{
-            if(tmp<cont){
-                tmp=cont;
-            }
-            cont=0;
-        }
-    }
-    if(tmp<cont){
-        tmp=cont;
-    }
-    return tmp-1;
-}
-
-int isDelimiter(char p, char delim)
-{
-	return p == delim;
-}
-
-int split(char *dst[], char *src, char delim)
-{
-	int count = 0;
-
-	for (;;)
-	{
-		while (isDelimiter(*src, delim))
-		{
-			src++;
-		}
-
-		if (*src == '\0')
-			break;
-
-		dst[count++] = src;
-
-		while (*src && !isDelimiter(*src, delim))
-		{
-			src++;
-		}
-
-		if (*src == '\0')
-			break;
-
-		*src++ = '\0';
-	}
-	return count;
 }

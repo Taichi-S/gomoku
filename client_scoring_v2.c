@@ -15,14 +15,14 @@ void printBoard(void);
 int board[BOARD_SQUARE][BOARD_SQUARE]={
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,2,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,2,2,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,2,2,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,1,1,1,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,2,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,2,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -38,7 +38,7 @@ int main(void) {
     printBoard();
 
     boardScoring();
-    printScoreBoard(1);
+    //printScoreBoard(1);
     printScoreBoard(2);
 	return 0;
 
@@ -115,7 +115,7 @@ void boardScoring(){
 					int tempY=sy+cdIni[cd][1];
                     //printf("tempX=%d ,tempY=%d\n", tempX, tempY);
 					for(cb=0;cb<9;cb++){
-						if(tempY<0 | tempX<0){
+						if((tempY<0 || tempX<0) || (tempX>=15 || tempY>=15)){
                             checkBoard[cb]=0;
                         }else{
                             checkBoard[cb]=board[tempY][tempX];	
@@ -124,7 +124,7 @@ void boardScoring(){
 						tempY+=cdGap[cd][1];
 					}
 					
-					//output_array(checkBoard, sizeof(checkBoard)/sizeof(int));
+					output_array(checkBoard, sizeof(checkBoard)/sizeof(int));
 					
 					scoreBoard[sy][sx][player_number-1]+=matchingScore(checkBoard, player_number, 1);
 					scoreBoard[sy][sx][enemy_number-1]+=matchingScore(checkBoard, enemy_number, 2);
