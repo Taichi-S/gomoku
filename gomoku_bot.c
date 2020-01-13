@@ -20,26 +20,10 @@ int split(char *dst[], char *src, char delim);
 int forbidden_hand_judgement(int bx, int by);
 
 //bot
-int* gomokuBot(void);
+void gomokuBot(int array[2]);
 
 // int board[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
-int board[BOARD_SQUARE][BOARD_SQUARE]={
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,2,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,2,2,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,2,2,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-    };
+int board[BOARD_SQUARE][BOARD_SQUARE]={{0}};
 int scoreBoard[BOARD_SQUARE][BOARD_SQUARE][2] = {{0}};
 int player_number;
 int enemy_number;
@@ -109,16 +93,26 @@ int main(void) {
 
 	printf("you could connect to %s\n", destination);
 
+    int start_count = 0;
     //以下bot
     while (1)
 	{
 		char buffer[1024];
-		//サーバからデータを受信
-
+		
 		recv(s, buffer, 1024, 0);
 
 		printf("->%s\n\n", buffer);
+        
+        if(start_count==0){
+            char message[32];
 
+		    scanf("%s", message);
+
+		    send(s, message, strlen(message), 0);
+
+            start_count++;
+            continue;
+        }
 		//サーバーからの受信情報(buffer)をboard配列に挿入する
 		count = split(dst, buffer, ',');
 
@@ -137,20 +131,20 @@ int main(void) {
 					printf("It is forbidden_hand!");
 					puts("I am Winner!!");
 					while (1);
-				}else{
-                    board[by - 1][bx - 1] = enemy_number;
-                    printBoard();
-                }
+				}
 			}
+            board[by - 1][bx - 1] = enemy_number;
+            printBoard();
 		}
 
 		//サーバにデータを送信
 
 		printf("bot turn\n");
         
-        int* array = gomokuBot();
+        int array[2];
+        gomokuBot(array);
         bx = *array;
-        by = *(array+1);
+        by = *(array + 1);
 		if (bx == 0 || by == 0)
 		{
 		}
@@ -161,6 +155,8 @@ int main(void) {
 		}
         char message[32];
         sprintf(message, "%d,%d", bx, by);
+        
+        puts(message);
         send(s, message, strlen(message), 0);
 		// Windows でのソケットの終了
 		//closesocket(s);
@@ -175,13 +171,12 @@ int main(void) {
 
 }
 
-int* gomokuBot(void){
+void gomokuBot(int array[2]){
     int bx, by;
-    bx = rand()%15+1;
-    by = rand()%15+1;
-    printf("%d, %d\n",bx, by);
-    int array[2] = {bx, by};
-    return array;
+    
+   
+    *array = rand()%15+1;
+    *(array+1) = rand()%15+1;
 }
 
 int forbidden_hand_judgement(int bx, int by)
