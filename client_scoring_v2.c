@@ -89,8 +89,6 @@ void printScoreBoard(int whichPlayer){
     }
 }
 
-//���u���I�������_���������Ȃ��Ƃ����񂩂��H�i��O�̎���g���Ȃ炢����)
-//�Ֆʂ�S�ʒT�����āC�܂��΂��u����Ă��Ȃ��ꏊ�̓_���t��������(�_���͉��Z���Ă���)�D���̒l�́C3�����z��scoreBoard�ɋL�^����D
 void boardScoring(){
 
 	int sx,sy;
