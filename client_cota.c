@@ -198,7 +198,7 @@ while(1){
 	//closesocket(s);
 
 	//WSACleanup();
-  Å@s}
+  }
 
 
 	return 0;
