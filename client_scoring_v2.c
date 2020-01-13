@@ -5,14 +5,11 @@
 
 #define BOARD_SQUARE 15
 
-//�v���g�^�C�v�錾
-
 void boardScoring();
 int matchingScore(int *checkBoard, int whichPlayer, int putPlayer);
 void output_array(int *in, int len);
 void printScoreBoard(int whichPlayer);
 void printBoard(void);
-//��s�̃v���C���[(���C1)�̃A���S���Y���̎�����ׂė��񂷂�(�����̋t���܂�)
 
 // int board[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
 int board[BOARD_SQUARE][BOARD_SQUARE]={
@@ -32,25 +29,15 @@ int board[BOARD_SQUARE][BOARD_SQUARE]={
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
     };
-//�œK�ȑł����T�����߂ɔՖʂ̃p�^�[���ɂ���čs���_���t�����L�^����ՖʁD�����ƓG��2�̃X�R�A�{�[�h��ێ�����D
-//��s��0�ԖڂɁC��U��1�ԖڂɊi�[����
 int scoreBoard[BOARD_SQUARE][BOARD_SQUARE][2] = {{0}};
-
-//��������s����U�����L�^����(��s(��)��1, ��U(��)��2)
 int player_number=1;
 int enemy_number=2;
-
-//�����t���b�O(��������������1)
 int isWin=0;
 
 int main(void) {
     printBoard();
 
     boardScoring();
-
-    //�_���t�������Ֆʂ��o�͂���(����)
-
-
     printScoreBoard(1);
     printScoreBoard(2);
 	return 0;
@@ -102,28 +89,26 @@ void printScoreBoard(int whichPlayer){
     }
 }
 
-//���u���I�������_���������Ȃ��Ƃ����񂩂��H�i��O�̎���g���Ȃ炢����)
-//�Ֆʂ�S�ʒT�����āC�܂��΂��u����Ă��Ȃ��ꏊ�̓_���t��������(�_���͉��Z���Ă���)�D���̒l�́C3�����z��scoreBoard�ɋL�^����D
 void boardScoring(){
 
 	int sx,sy;
 	int cd, cb;
 	int checkBoard[9];
 	int cdIni[4][2]={
-		{0, -4},	//�c
-		{-4, 0},	//��
-		{-4, -4},	//�E������΂�
-		{4, -4}		//�E�オ��΂�
+		{0, -4},	
+		{-4, 0},
+		{-4, -4},
+		{4, -4}		
 	};
 	int cdGap[4][2]={
-		{0, 1},		//�c
-		{1, 0},		//��
-		{1, 1},		//�E������΂�
-		{-1, 1}		//�E�オ��΂�
+		{0, 1},		
+		{1, 0},		
+		{1, 1},	
+		{-1, 1}		
 	};
 	for(sy=0;sy<BOARD_SQUARE;sy++){
 		for(sx=0;sx<BOARD_SQUARE;sx++){
-			if(board[sy][sx]==0){		//�΂�������Ă��Ȃ��Ƃ��A�S����������
+			if(board[sy][sx]==0){		
                 //printf("x=%d, y=%d\n", sx, sy);
 				for(cd=0;cd<4;cd++){
 					int tempX=sx+cdIni[cd][0];
@@ -140,7 +125,7 @@ void boardScoring(){
 					}
 					
 					//output_array(checkBoard, sizeof(checkBoard)/sizeof(int));
-					//�X�R�A�����Z���ĉ��̔ՖʂɊi�[����
+					
 					scoreBoard[sy][sx][player_number-1]+=matchingScore(checkBoard, player_number, 1);
 					scoreBoard[sy][sx][enemy_number-1]+=matchingScore(checkBoard, enemy_number, 2);
 				}
@@ -156,9 +141,7 @@ void output_array(int *in, int len){
 	puts("");
 }
 
-//�}�b�`���O�������ǂ���+�}�b�`���O�����p�^�[���ƑΏ۔z���0����v���Ă��邩+����ɂ��_�������_����
-//�ꏊ�ˑ��₩��C�}�b�`���O�����̃��\�b�h�ɂ͂ł��Ȃ�
-//1�̕���(�v�f��9�̈ꎟ�z��)�ɑ΂��āC35��ޑS�Ẵp�^�[����T������
+
 int matchingScore(int *checkBoard, int whichPlayer, int putPlayer){
 	int mi, mj;
 	int cont=0;
