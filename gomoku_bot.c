@@ -13,9 +13,11 @@ typedef struct Map{
     int score;
     int enemy_score;
     int score_diff;
+    int enemy_x;
+    int enemy_y;
 }map;
 //scoring
-void boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlayer,  int statusBoard[BOARD_SQUARE][BOARD_SQUARE],int print);
+int boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlayer,  int statusBoard[BOARD_SQUARE][BOARD_SQUARE],int print);
 int matchingScore(int *checkBoard, int whichPlayer, int putPlayer);
 void output_array(int *in, int len);
 void printScoreBoard(int tmp_board[BOARD_SQUARE][BOARD_SQUARE]);
@@ -29,8 +31,8 @@ int forbidden_hand_judgement(int bx, int by);
 void gomokuBot(int array[2]);
 int getOpposite(int whichPlayer);
 void printScoreBoard2(map tmp_board[BOARD_SQUARE*BOARD_SQUARE]);
-void check(int array[2], map map_array[BOARD_SQUARE*BOARD_SQUARE]);
-int checkDuplication(map tmp);
+void check(int array[2], map map_array[BOARD_SQUARE*BOARD_SQUARE], int mode);
+int checkDuplication(int x, int y);
 
 // int board[BOARD_SQUARE][BOARD_SQUARE] = {{0}};
 int board[BOARD_SQUARE][BOARD_SQUARE]={{0}};
@@ -202,15 +204,23 @@ void gomokuBot(int array[2]){
                 tmp_board[tmp_i][tmp_j] = board[tmp_i][tmp_j];
             }
         }
-
+        int tmp;
         map tmp_map[BOARD_SQUARE*BOARD_SQUARE];
-        boardScoring(tmp_map, 1, player_number, tmp_board, 0);
-
+        tmp = boardScoring(tmp_map, 1, player_number, tmp_board, 0);
+        if(tmp==1){
+            puts("attack");
+        }else if(tmp==0){
+            puts("diffence");
+        }else{
+            puts("normal");
+        }
         int wei;
         for(wei=0; wei<BOARD_SQUARE*BOARD_SQUARE; wei++){
-            printf("%d,%d  score=%d, enemy_score=%d, diff=%d\n", tmp_map[wei].x, tmp_map[wei].y, tmp_map[wei].score, tmp_map[wei].enemy_score, tmp_map[wei].score_diff);
+            printf("%d,%d  score=%d, enemy_score=%d, diff=%d, enemy_x=%d, enemy_y=%d\n", tmp_map[wei].x, tmp_map[wei].y, tmp_map[wei].score, tmp_map[wei].enemy_score, tmp_map[wei].score_diff, tmp_map[wei].enemy_x, tmp_map[wei].enemy_y);
         }
-        check(array, tmp_map);
+
+
+        check(array, tmp_map, tmp);
         
         return;
     }else{
@@ -227,27 +237,43 @@ void gomokuBot(int array[2]){
     
 }
 
-void check(int array[2], map map_array[BOARD_SQUARE*BOARD_SQUARE]){
+void check(int array[2], map map_array[BOARD_SQUARE*BOARD_SQUARE], int mode){
     int i;
-    for(i=0; i<BOARD_SQUARE*BOARD_SQUARE; i++){
-        if(checkDuplication(map_array[i])){
-            *array = map_array[i].x;
-            *(array+1) = map_array[i].y;
-            return;
+    int diffence = 0;
+    if(mode==diffence){
+        for(i=0; i<BOARD_SQUARE*BOARD_SQUARE; i++){
+            //printf("%d\n",board[map_array[i].enemy_y-1][map_array[i].enemy_x-1]);
+            if(checkDuplication(map_array[i].enemy_x,map_array[i].enemy_y)){
+                printf("%d,%d  score=%d, enemy_score=%d, diff=%d, enemy_x=%d, enemy_y=%d\n", map_array[i].x, map_array[i].y, map_array[i].score, map_array[i].enemy_score, map_array[i].score_diff, map_array[i].enemy_x, map_array[i].enemy_y);
+                *array = map_array[i].enemy_x;
+                *(array+1) = map_array[i].enemy_y;
+                return;
+            }
+        }
+    }else{
+        for(i=0; i<BOARD_SQUARE*BOARD_SQUARE; i++){
+            if(checkDuplication(map_array[i].x, map_array[i].y)){
+                *array = map_array[i].x;
+                *(array+1) = map_array[i].y;
+                return;
+            }
         }
     }
 }
 
-int checkDuplication(map tmp){
-    if(board[tmp.y-1][tmp.x-1]!=0){
+int checkDuplication(int x, int y){
+    if(x==0 || y == 0){
         return 0;
     }
-    return 1;
+    if(board[y-1][x-1]==0){
+        return 1;
+    }
+    return 0;
 }
 
 
 
-void boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlayer, int statusBoard[BOARD_SQUARE][BOARD_SQUARE],int print){
+int boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlayer, int statusBoard[BOARD_SQUARE][BOARD_SQUARE],int print){
     if(whichPlayer==enemy_number){
        // count--;
     }
@@ -306,8 +332,8 @@ void boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPla
 					}
 					
 					//output_array(checkBoard, sizeof(checkBoard)/sizeof(int));
-					
-					scoreMap[sy*BOARD_SQUARE+sx].score+=matchingScore(checkBoard, whichPlayer, whichPlayer);
+					if(scoreMap[sy*BOARD_SQUARE+sx].score < matchingScore(checkBoard, whichPlayer, whichPlayer))
+					scoreMap[sy*BOARD_SQUARE+sx].score = matchingScore(checkBoard, whichPlayer, whichPlayer);
                     scoreMap[sy*BOARD_SQUARE+sx].x = sx+1;
                     scoreMap[sy*BOARD_SQUARE+sx].y = sy+1;
 					//scoreBoard[sy][sx][enemy_number-1]+=matchingScore(checkBoard, enemy_number, enemy_number);
@@ -318,6 +344,8 @@ void boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPla
                     map re_tmp_map[BOARD_SQUARE*BOARD_SQUARE];
                     
                     boardScoring(re_tmp_map,0, getOpposite(whichPlayer), tmp_board,0);
+                    scoreMap[sy*BOARD_SQUARE+sx].enemy_x = re_tmp_map[0].x;
+                    scoreMap[sy*BOARD_SQUARE+sx].enemy_y = re_tmp_map[0].y;
                     scoreMap[sy*BOARD_SQUARE+sx].enemy_score = re_tmp_map[0].score;
                     scoreMap[sy*BOARD_SQUARE+sx].score_diff = scoreMap[sy*BOARD_SQUARE+sx].score - scoreMap[sy*BOARD_SQUARE+sx].enemy_score;
                     tmp_board[sy][sx] = 0;
@@ -344,6 +372,7 @@ void boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPla
     }
     //printScoreBoard(scoreBoard);
     convert(tmp_map, scoreMap, mode);
+    return mode;
 }
 
 
@@ -360,6 +389,8 @@ void convert(map tmp_map[BOARD_SQUARE*BOARD_SQUARE], map score_map[BOARD_SQUARE*
         tmp_map[tmp_i].score_diff = score_map[tmp_i].score_diff;
         tmp_map[tmp_i].x = score_map[tmp_i].x;
         tmp_map[tmp_i].y = score_map[tmp_i].y;
+        tmp_map[tmp_i].enemy_x = score_map[tmp_i].enemy_x;
+        tmp_map[tmp_i].enemy_y = score_map[tmp_i].enemy_y;
         
     }
     int max;
@@ -376,11 +407,12 @@ void convert(map tmp_map[BOARD_SQUARE*BOARD_SQUARE], map score_map[BOARD_SQUARE*
                 }
             }
         }
+        
     }else if(mode==diffence){
         for(tmp_i=0; tmp_i<BOARD_SQUARE*BOARD_SQUARE; tmp_i++){
         
             for(tmp_j=0; tmp_j<BOARD_SQUARE*BOARD_SQUARE-1; tmp_j++){
-                if(tmp_map[tmp_j].enemy_score>tmp_map[tmp_j+1].enemy_score){
+                if(tmp_map[tmp_j].enemy_score<tmp_map[tmp_j+1].enemy_score){
                     map tmp;
                     tmp =tmp_map[tmp_j+1];
                     tmp_map[tmp_j+1] = tmp_map[tmp_j];
@@ -388,6 +420,7 @@ void convert(map tmp_map[BOARD_SQUARE*BOARD_SQUARE], map score_map[BOARD_SQUARE*
                 }
             }
         }
+        
     }else{
         for(tmp_i=0; tmp_i<BOARD_SQUARE*BOARD_SQUARE; tmp_i++){
         
@@ -400,6 +433,7 @@ void convert(map tmp_map[BOARD_SQUARE*BOARD_SQUARE], map score_map[BOARD_SQUARE*
                 }
             }
         }
+        
     }
 
 }
