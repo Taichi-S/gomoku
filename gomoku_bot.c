@@ -43,7 +43,7 @@ int first_player = 1;//先攻
 int second_player = 2;//後攻
 int start_count = 0;
 int isWin = 0;
-
+int isDraw = 0;
 int main(void) {
     char *dst[10]; //bufferを分割した文字列を格納する
 	int count;	 //分割した文字数を格納する
@@ -167,8 +167,18 @@ int main(void) {
 			board[by - 1][bx - 1] = player_number;
             printBoard();
 		}
-        char message[32];
-        sprintf(message, "%d,%d", bx, by);
+        char message[255];
+        if(isWin){
+            sprintf(message, "%d,%d, win", bx, by);
+            send(s, message, strlen(message), 0);
+            while(1);
+        }else if(isDraw){
+            sprintf(message, "%d,%d, draw", bx, by);
+            send(s, message, strlen(message), 0);
+            while(1);
+        }else{
+            sprintf(message, "%d,%d", bx, by);
+        }
         
         puts(message);
         send(s, message, strlen(message), 0);
@@ -208,7 +218,7 @@ void gomokuBot(int array[2]){
             return;
         }
         
-        tmp = boardScoring(tmp_map, 1, player_number, tmp_board, 0);
+        tmp = boardScoring(tmp_map, 1, player_number, tmp_board, 1);
         if(tmp==1){
             puts("attack");
         }else if(tmp==0){
@@ -232,7 +242,7 @@ void gomokuBot(int array[2]){
             *(array+1) = 8;
             return;
         }
-        tmp = boardScoring(tmp_map, 1, player_number, tmp_board, 0);
+        tmp = boardScoring(tmp_map, 1, player_number, tmp_board, 1);
         if(tmp==1){
             puts("attack");
         }else if(tmp==0){
@@ -264,6 +274,7 @@ void check(int array[2], map map_array[BOARD_SQUARE*BOARD_SQUARE], int mode){
                 return;
             }
         }
+        isDraw = 1;
     }else{
         for(i=0; i<BOARD_SQUARE*BOARD_SQUARE; i++){
             if(checkDuplication(map_array[i].x, map_array[i].y)){
@@ -272,6 +283,7 @@ void check(int array[2], map map_array[BOARD_SQUARE*BOARD_SQUARE], int mode){
                 return;
             }
         }
+        isDraw = 1;
     }
 }
 
@@ -346,8 +358,16 @@ int boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlay
 					}
 					
 					//output_array(checkBoard, sizeof(checkBoard)/sizeof(int));
-					if(scoreMap[sy*BOARD_SQUARE+sx].score < matchingScore(checkBoard, whichPlayer, whichPlayer))
-					scoreMap[sy*BOARD_SQUARE+sx].score = matchingScore(checkBoard, whichPlayer, whichPlayer);
+					if(scoreMap[sy*BOARD_SQUARE+sx].score < matchingScore(checkBoard, whichPlayer, whichPlayer)){
+					    scoreMap[sy*BOARD_SQUARE+sx].score = matchingScore(checkBoard, whichPlayer, whichPlayer);
+                    }
+                    if((scoreMap[sy*BOARD_SQUARE+sx].score >= 4) && whichPlayer==player_number){
+                        
+            
+                        isWin=1;
+                        
+                    
+                    }
                     scoreMap[sy*BOARD_SQUARE+sx].x = sx+1;
                     scoreMap[sy*BOARD_SQUARE+sx].y = sy+1;
 					//scoreBoard[sy][sx][enemy_number-1]+=matchingScore(checkBoard, enemy_number, enemy_number);
@@ -381,6 +401,7 @@ int boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlay
             }
         }
         if(mode!=attack){
+
             mode= diffence;
         }
     }
@@ -470,9 +491,7 @@ int matchingScore(int *checkBoard, int whichPlayer, int putPlayer){
         if(checkBoard[mi]==whichPlayer){
             cont++;
         }else{
-            if(cont==5){
-
-            }
+            
             if(tmp<cont){
                 tmp=cont;
             }
