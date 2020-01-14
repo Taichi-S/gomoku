@@ -614,209 +614,119 @@ int split(char *dst[], char *src, char delim)
 	return count;
 }
 
-int forbidden_hand_judgement(int bx, int by)
-{
-    int tmp_board[BOARD_SQUARE][BOARD_SQUARE];
-    int tmp_i, tmp_j;
-
-    //配列のコピー
-    for(tmp_i=0; tmp_i<BOARD_SQUARE; tmp_i++){
-        for(tmp_j=0; tmp_j<BOARD_SQUARE; tmp_j++){
-            tmp_board[tmp_i][tmp_j] = board[tmp_i][tmp_j];
-        }
-    }
-    tmp_board[by-1][bx-1] = first_player;
+int forbidden_hand_judgement(int bx,int by){
 	//三三禁
-	char xsigns[8] = "++0-"; //対象座標から八方への走査に必要な符号
-	char ysigns[8] = "0+++";
+	char xsigns[8]="++0-";	//置かれた手から八方への走査に必要な符号
+	char ysigns[8]="0+++";
 
-	//int by = 0;
-	//int bx = 0;
-	//for (ki = 1; ki < BOARD_SQUARE + 1; by++)
-	//{
+	int san_counter = 0;	//三三禁になりうる三を数えるもの
+	int yon_counter = 0;	//四四禁になりうる四を数えるもの
+	int choren_flag = 0; //長連があるかないか
+					
+	int ik = 0;
+	for(ik = 0; ik < 4; ik ++){	//置かれた手から八方（４X２）を走査
+		int xvector;	//置かれた手から進む向きをここに入れる
+		int yvector;
 
+		switch (xsigns[ik]){	//置かれた手から進む向きを決定
+			case '+': xvector = 1; break;
+			case '-': xvector = -1; break;
+			case '0': xvector = 0; break;
+		}
 
-		//for (mj = 1; mj < BOARD_SQUARE + 1; mj++)
-		//{
-			int san_counter = 0; //三三禁になりうる三を数えるもの
-			int yon_counter = 0; //四四禁になりうる四を数えるもの
-			int choren_flag = 0;
+		switch (ysigns[ik]){
+			case '+': yvector = 1; break;
+			case '-': yvector = -1; break;
+			case '0': yvector = 0; break;
+		}
 
-			if (tmp_board[bx - 1][by - 1] == 1)
-			{ //対象座標が、先行の相手が置いたもの
-				int ik = 0;
-				for (ik = 0; ik < 4; ik++)
-				{				 //対象座標から八方（４X２）を走査
-					int xvector; //対象座標から進む向きをここに入れる
-					int yvector;
+		int jm = 0;
+		int xweight = 0;	//置かれた手から走査を進める向きとその大きさをここに入れる
+		int yweight = 0;
+		int xmax = bx-1;	//置かれた手を含む直線上にある、黒の手の最大の座標と最小の座標をここに入れる
+		int ymax = by-1;
+		int xmin = bx-1;
+		int ymin = by-1;
+		int black_counter = 0;	//置かれた手を含む直線上にある先攻の手を数えるもの
+		int san_reach_flag = 0; //三が一つ見つかった時点でこのフラグを１にする
+		int yon_reach_flag = 0;
+		int white_in_plus_flag = 0; //直線走査中に白の手が見つかり次第その方向の走査をとめるためのフラグ
+		int white_in_minus_flag = 0;
 
-					switch (xsigns[ik])
-					{ //対象座標から進む向きを決定
-					case '+':
-						xvector = 1;
-						break;
-					case '-':
-						xvector = -1;
-						break;
-					case '0':
-						xvector = 0;
-						break;
-					}
+		for(int jm = 0; jm < 4; jm++){ //置かれた手から、禁じ手となる手が存在しうる範囲で、直線上を走査
+			xweight += xvector;	//置かれた手が進む向きと大きさを決定
+			yweight += yvector;
 
-					switch (ysigns[ik])
-					{
-					case '+':
-						yvector = 1;
-						break;
-					case '-':
-						yvector = -1;
-						break;
-					case '0':
-						yvector = 0;
-						break;
-					}
-
-					int jm = 0;
-					int xweight = 0; //対象座標が進む向きと大きさをここに入れる
-					int yweight = 0;
-					int xmax = bx - 1; //対象の座標を含む直線上にあり、判定に必要な最大の座標と最小の座標をここに入れる
-					int ymax = by - 1;
-					int xmin = bx - 1;
-					int ymin = by - 1;
-					int black_counter = 0;  //対象の座標を含む直線上にある先攻の手を数えるもの
-					int san_reach_flag = 0; //三が一つ見つかった時点でこのフラグを１にする
-					int yon_reach_flag = 0;
-					int white_in_plus_flag = 0;
-					int white_in_minus_flag = 0;
-
-					for (int jm = 0; jm < 4; jm++)
-					{						//対象座標から三々禁となりうる直線上の範囲を走査
-						xweight += xvector; //対象座標が進む向きと大きさを決定
-						yweight += yvector;
-
-						if (tmp_board[bx - 1 + xweight][by - 1 + yweight] == 1 && white_in_plus_flag == 0)
-						{							 //進んだ先の座標が先攻（相手）の手であれば-(*)
-							black_counter++;		 //対象の座標を含む直線上にある先攻の手をカウント
-							xmax = bx - 1 + xweight; //その手（座標）を最大座標として保存
-							ymax = by - 1 + yweight;
-						}
-						else if (tmp_board[bx - 1 + xweight][by - 1 + yweight] == 2)
-						{
-							white_in_plus_flag = 1;
-						}
-
-						if (black_counter == 2 && san_reach_flag == 0)
-						{						//対象座標の他に直線上にある先攻の手が２つあれば
-							san_counter++;		//三々禁となりうる三をカウント
-							san_reach_flag = 1; //三フラグを立てる
-												//break;	//今回の直線の走査は終了
-						}
-						else if (black_counter == 3 && yon_reach_flag == 0)
-						{						//対象座標の他に直線上にある先攻の手が２つあれば
-							yon_counter++;		//四四禁となりうる四をカウント
-							yon_reach_flag = 1; //四フラグを立てる
-												//break;	//今回の直線の走査は終了
-						}
-
-						if (abs(xmax - xmin) == 4 || abs(ymax - ymin) == 4)
-						{
-							if (black_counter == 4)
-							{   //相手の手が５つ並んでいたら
-								//長連の可能性あり
-							}
-						}
-						else if (abs(xmax - xmin) > 4 || abs(ymax - ymin) > 4)
-						{
-							if (black_counter == 5)
-							{					 //相手の手が６つ並んだら
-								choren_flag = 1; //長連フラグを立てる
-								break;
-							}
-							else
-							{
-								break; //禁じ手となり得ない範囲まで走査したら、今回の直線の走査は終了
-							}
-						}
-
-						if (tmp_board[bx - 1 - xweight][by - 1 - yweight] == 1 && white_in_minus_flag == 0)
-						{							 //（*)とは反対向きに進んだ先の座標が先攻（相手）の手であれば
-							black_counter++;		 //対象の座標を含む直線上にある先攻の手をカウント
-							xmin = bx - 1 - xweight; //その手（座標）を最小座標として保存
-							ymin = by - 1 - yweight;
-						}
-						else if (tmp_board[bx - 1 + xweight][by - 1 + yweight] == 2)
-						{
-							white_in_minus_flag = 1;
-						}
-
-						if (black_counter == 2 && san_reach_flag == 0)
-						{				   //対象座標の他に直線上にある先攻の手が２つあれば
-							san_counter++; //三々禁となりうる三をカウント
-							san_reach_flag = 1;
-							//break;	//今回の直線の走査は終了
-						}
-						else if (black_counter == 3 && yon_reach_flag == 0)
-						{				   //対象座標の他に直線上にある先攻の手が２つあれば
-							yon_counter++; //四四禁となりうる四をカウント
-							yon_reach_flag = 1;
-							//break;	//今回の直線の走査は終了
-						}
-
-						if (abs(xmax - xmin) == 4 || abs(ymax - ymin) == 4)
-						{
-							if (black_counter == 4)
-							{   //相手の手が５つ並んでいたら
-								//長連の可能性
-							}
-						}
-						else if (abs(xmax - xmin) > 4 || abs(ymax - ymin) > 4)
-						{
-							if (black_counter == 5)
-							{					 //相手の手が６つ並んだら
-								choren_flag = 1; //長連フラグを立てる
-								
-							}
-							else
-							{
-								 //三となり得ない範囲まで走査したら、今回の直線の走査は終了
-							}
-						}
-					}
-				}
-
-				if (yon_counter == 2)
-				{ //四四禁があれば
-					puts("It is forbidden hand!:yonyonkin");
-					//end_flag = 1;
-					return 1;
-					 //禁じ手のプログラムを終了
-				}
-				else if (san_counter == 2 && yon_counter == 0)
-				{ //三三禁があれば
-					puts("It is forbidden hand!:sansankin");
-					//end_flag = 1;
-					return 1;
-					 //禁じ手のプログラムを終了
-				}
-				else if (choren_flag == 1)
-				{ //長連があれあば
-					puts("It is forbidden hand!:choren");
-					//end_flag = 1;
-					return 1;
-					//禁じ手のプログラムを終了
-				}
-			}
-			else
-			{
+			if(board[by-1+yweight][bx-1+xweight] == 1 && white_in_plus_flag == 0){	//走査対象の座標が黒の手であれば-(*)
+				black_counter++; //置かれた手を含む直線上の黒の手をカウント
+				xmax = bx-1+xweight; //その手（座標）を最大座標として保存
+				ymax = by-1+yweight;
+			} else if(board[by-1+yweight][bx-1+xweight] == 2){ //走査中に白の手があれば
+				white_in_plus_flag = 1;//フラグを立てる
 			}
 
-			//if(end_flag) break;
-		//}
-		//if(end_flag) break;
-	//}
-    return 0;
-	// if(end_flag){
-	// 	puts("I am Winner!!");
-	// 	while(1);
-	// }
+			if(black_counter == 2 && san_reach_flag == 0){	//置かれた手の他に一直線上に黒の手が２つ見つかれば
+				san_counter++; //三々禁となりうる三をカウント
+				san_reach_flag = 1;//三フラグを立てる
+			}else if(black_counter == 3 && yon_reach_flag == 0){	//置かれた手の他に一直線上に黒の手が3つ見つかれば
+				yon_counter++; //四四禁となりうる四をカウント
+				yon_reach_flag = 1;//四フラグを立てる
+			}
+		
+			if(abs(xmax - xmin) == 4 || abs(ymax - ymin) == 4){
+				if(black_counter == 4){ //黒の手が５つ並んでいたら
+					
+				}
+			}else if(abs(xmax - xmin) > 4 || abs(ymax - ymin) > 4){
+				if(black_counter == 5){ //黒の手が６つ並んだら
+					choren_flag = 1; //長連フラグを立てる
+					break;
+				}else{
+					break; //禁じ手となり得ない範囲まで走査したら、今回の直線の走査は終了
+				}
+			} 
+
+			if(board[by-1-yweight][bx-1-xweight] == 1&& white_in_minus_flag == 0){ //（*)とは反対向きに進んだ時の走査対象の座標が黒の手であれば
+				black_counter++;	//置かれた手を含む直線上の黒の手をカウント
+				xmin = bx-1-xweight;	//その手（座標）を最小座標として保存
+				ymin = by-1-yweight;
+			}else if(board[by-1+yweight][bx-1+xweight] == 2){ //走査中に白の手があれば
+				white_in_minus_flag = 1;//フラグを立てる
+			}
+
+			if(black_counter == 2 && san_reach_flag == 0){	//置かれた手の他に一直線上に黒の手が２つ見つかれば
+				san_counter++;	//三々禁となりうる三をカウント
+				san_reach_flag = 1;//三フラグを立てる
+			}else if(black_counter == 3 && yon_reach_flag == 0){	//置かれた手の他に一直線上に黒の手が3つ見つかれば
+				yon_counter++; //四四禁となりうる四をカウント
+				yon_reach_flag = 1;//四フラグを立てる
+			}
+
+			if(abs(xmax - xmin) == 4 || abs(ymax - ymin) == 4){
+				if(black_counter == 4){	//黒の手が５つ並んでいたら
+					//長連の可能性
+				}
+			}else if(abs(xmax - xmin) > 4 || abs(ymax - ymin) > 4){
+				if(black_counter == 5){ //黒の手が６つ並んだら
+					choren_flag = 1; //長連フラグを立てる
+					break;
+				}else{
+					break; //禁じ手となり得ない範囲まで走査したら、今回の直線の走査は終了
+				}
+			} 
+		}
+						
+	}
+
+	if(yon_counter == 2) {	//四四禁があれば
+		puts("It is forbidden hand!:yonyonkin");
+		return 1;
+	}else if(san_counter == 2 && yon_counter == 0) {	//三三禁があれば
+		puts("It is forbidden hand!:sansankin");
+		return 1;
+	}else if(choren_flag == 1){ //長連があれあば
+		puts("It is forbidden hand!:choren");
+		return 1;
+	}
+	return 0;
 }
