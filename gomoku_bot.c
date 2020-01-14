@@ -42,6 +42,7 @@ int enemy_number;
 int first_player = 1;//先攻
 int second_player = 2;//後攻
 int start_count = 0;
+int isWin = 0;
 
 int main(void) {
     char *dst[10]; //bufferを分割した文字列を格納する
@@ -188,6 +189,17 @@ int main(void) {
 void gomokuBot(int array[2]){
     
     int tmp_array[2];
+    int tmp_board[BOARD_SQUARE][BOARD_SQUARE];
+    int tmp_i, tmp_j;
+
+    //配列のコピー
+    for(tmp_i=0; tmp_i<BOARD_SQUARE; tmp_i++){
+        for(tmp_j=0; tmp_j<BOARD_SQUARE; tmp_j++){
+                tmp_board[tmp_i][tmp_j] = board[tmp_i][tmp_j];
+        }
+    }
+    int tmp;
+    map tmp_map[BOARD_SQUARE*BOARD_SQUARE];
     if(player_number == second_player){
         if(start_count==1){
             start_count++;
@@ -195,17 +207,7 @@ void gomokuBot(int array[2]){
             *(array+1) = 9;
             return;
         }
-        int tmp_board[BOARD_SQUARE][BOARD_SQUARE];
-        int tmp_i, tmp_j;
-
-    //配列のコピー
-        for(tmp_i=0; tmp_i<BOARD_SQUARE; tmp_i++){
-            for(tmp_j=0; tmp_j<BOARD_SQUARE; tmp_j++){
-                tmp_board[tmp_i][tmp_j] = board[tmp_i][tmp_j];
-            }
-        }
-        int tmp;
-        map tmp_map[BOARD_SQUARE*BOARD_SQUARE];
+        
         tmp = boardScoring(tmp_map, 1, player_number, tmp_board, 0);
         if(tmp==1){
             puts("attack");
@@ -230,9 +232,21 @@ void gomokuBot(int array[2]){
             *(array+1) = 8;
             return;
         }
-        *array = rand()%15+1;
-        *(array+1) = rand()%15+1;
-        return;
+        tmp = boardScoring(tmp_map, 1, player_number, tmp_board, 0);
+        if(tmp==1){
+            puts("attack");
+        }else if(tmp==0){
+            puts("diffence");
+        }else{
+            puts("normal");
+        }
+        int wei;
+        for(wei=0; wei<BOARD_SQUARE*BOARD_SQUARE; wei++){
+            printf("%d,%d  score=%d, enemy_score=%d, diff=%d, enemy_x=%d, enemy_y=%d\n", tmp_map[wei].x, tmp_map[wei].y, tmp_map[wei].score, tmp_map[wei].enemy_score, tmp_map[wei].score_diff, tmp_map[wei].enemy_x, tmp_map[wei].enemy_y);
+        }
+
+
+        check(array, tmp_map, tmp);
     }
     
 }
@@ -244,7 +258,7 @@ void check(int array[2], map map_array[BOARD_SQUARE*BOARD_SQUARE], int mode){
         for(i=0; i<BOARD_SQUARE*BOARD_SQUARE; i++){
             //printf("%d\n",board[map_array[i].enemy_y-1][map_array[i].enemy_x-1]);
             if(checkDuplication(map_array[i].enemy_x,map_array[i].enemy_y)){
-                printf("%d,%d  score=%d, enemy_score=%d, diff=%d, enemy_x=%d, enemy_y=%d\n", map_array[i].x, map_array[i].y, map_array[i].score, map_array[i].enemy_score, map_array[i].score_diff, map_array[i].enemy_x, map_array[i].enemy_y);
+                printf("->%d,%d  score=%d, enemy_score=%d, diff=%d, enemy_x=%d, enemy_y=%d\n", map_array[i].x, map_array[i].y, map_array[i].score, map_array[i].enemy_score, map_array[i].score_diff, map_array[i].enemy_x, map_array[i].enemy_y);
                 *array = map_array[i].enemy_x;
                 *(array+1) = map_array[i].enemy_y;
                 return;
@@ -362,7 +376,7 @@ int boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlay
     if(count>0){
         int index;
         for(index=0; index<BOARD_SQUARE*BOARD_SQUARE; index++){
-            if(scoreMap[index].score_diff > 0){
+            if((scoreMap[index].score_diff >= 0) && checkDuplication(scoreMap[index].x, scoreMap[index].y)){
                 mode = attack;
             }
         }
@@ -456,9 +470,9 @@ int matchingScore(int *checkBoard, int whichPlayer, int putPlayer){
         if(checkBoard[mi]==whichPlayer){
             cont++;
         }else{
-            // if(checkBoard[mi]==getOpposite(whichPlayer)){
-            //     cont--;
-            // }
+            if(cont==5){
+
+            }
             if(tmp<cont){
                 tmp=cont;
             }
@@ -592,24 +606,24 @@ int forbidden_hand_judgement(int bx, int by)
             tmp_board[tmp_i][tmp_j] = board[tmp_i][tmp_j];
         }
     }
-    tmp_board[by-1][bx-1];
+    tmp_board[by-1][bx-1] = first_player;
 	//三三禁
 	char xsigns[8] = "++0-"; //対象座標から八方への走査に必要な符号
 	char ysigns[8] = "0+++";
 
-	int ki = 0;
-	int mj = 0;
-	for (ki = 1; ki < BOARD_SQUARE + 1; ki++)
-	{
+	//int by = 0;
+	//int bx = 0;
+	//for (ki = 1; ki < BOARD_SQUARE + 1; by++)
+	//{
 
 
-		for (mj = 1; mj < BOARD_SQUARE + 1; mj++)
-		{
+		//for (mj = 1; mj < BOARD_SQUARE + 1; mj++)
+		//{
 			int san_counter = 0; //三三禁になりうる三を数えるもの
 			int yon_counter = 0; //四四禁になりうる四を数えるもの
 			int choren_flag = 0;
 
-			if (tmp_board[mj - 1][ki - 1] == 1)
+			if (tmp_board[bx - 1][by - 1] == 1)
 			{ //対象座標が、先行の相手が置いたもの
 				int ik = 0;
 				for (ik = 0; ik < 4; ik++)
@@ -646,10 +660,10 @@ int forbidden_hand_judgement(int bx, int by)
 					int jm = 0;
 					int xweight = 0; //対象座標が進む向きと大きさをここに入れる
 					int yweight = 0;
-					int xmax = mj - 1; //対象の座標を含む直線上にあり、判定に必要な最大の座標と最小の座標をここに入れる
-					int ymax = ki - 1;
-					int xmin = mj - 1;
-					int ymin = ki - 1;
+					int xmax = bx - 1; //対象の座標を含む直線上にあり、判定に必要な最大の座標と最小の座標をここに入れる
+					int ymax = by - 1;
+					int xmin = bx - 1;
+					int ymin = by - 1;
 					int black_counter = 0;  //対象の座標を含む直線上にある先攻の手を数えるもの
 					int san_reach_flag = 0; //三が一つ見つかった時点でこのフラグを１にする
 					int yon_reach_flag = 0;
@@ -661,13 +675,13 @@ int forbidden_hand_judgement(int bx, int by)
 						xweight += xvector; //対象座標が進む向きと大きさを決定
 						yweight += yvector;
 
-						if (tmp_board[mj - 1 + xweight][ki - 1 + yweight] == 1 && white_in_plus_flag == 0)
+						if (tmp_board[bx - 1 + xweight][by - 1 + yweight] == 1 && white_in_plus_flag == 0)
 						{							 //進んだ先の座標が先攻（相手）の手であれば-(*)
 							black_counter++;		 //対象の座標を含む直線上にある先攻の手をカウント
-							xmax = mj - 1 + xweight; //その手（座標）を最大座標として保存
-							ymax = ki - 1 + yweight;
+							xmax = bx - 1 + xweight; //その手（座標）を最大座標として保存
+							ymax = by - 1 + yweight;
 						}
-						else if (tmp_board[mj - 1 + xweight][ki - 1 + yweight] == 2)
+						else if (tmp_board[bx - 1 + xweight][by - 1 + yweight] == 2)
 						{
 							white_in_plus_flag = 1;
 						}
@@ -705,13 +719,13 @@ int forbidden_hand_judgement(int bx, int by)
 							}
 						}
 
-						if (tmp_board[mj - 1 - xweight][ki - 1 - yweight] == 1 && white_in_minus_flag == 0)
+						if (tmp_board[bx - 1 - xweight][by - 1 - yweight] == 1 && white_in_minus_flag == 0)
 						{							 //（*)とは反対向きに進んだ先の座標が先攻（相手）の手であれば
 							black_counter++;		 //対象の座標を含む直線上にある先攻の手をカウント
-							xmin = mj - 1 - xweight; //その手（座標）を最小座標として保存
-							ymin = ki - 1 - yweight;
+							xmin = bx - 1 - xweight; //その手（座標）を最小座標として保存
+							ymin = by - 1 - yweight;
 						}
-						else if (tmp_board[mj - 1 + xweight][ki - 1 + yweight] == 2)
+						else if (tmp_board[bx - 1 + xweight][by - 1 + yweight] == 2)
 						{
 							white_in_minus_flag = 1;
 						}
@@ -778,9 +792,9 @@ int forbidden_hand_judgement(int bx, int by)
 			}
 
 			//if(end_flag) break;
-		}
+		//}
 		//if(end_flag) break;
-	}
+	//}
     return 0;
 	// if(end_flag){
 	// 	puts("I am Winner!!");
