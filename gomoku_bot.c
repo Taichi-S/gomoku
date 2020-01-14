@@ -374,10 +374,14 @@ int boardScoring(map tmp_map[BOARD_SQUARE*BOARD_SQUARE],int count, int whichPlay
         printScoreBoard2(scoreMap);
     }
     if(count>0){
-        if(player_number == first_player){
-            mode = normal;
-        }else{
-            mode = diffence;
+        int index;
+        for(index=0; index<BOARD_SQUARE*BOARD_SQUARE; index++){
+            if((scoreMap[index].score_diff >= 0) && checkDuplication(scoreMap[index].x, scoreMap[index].y)){
+                mode = attack;
+            }
+        }
+        if(mode!=attack){
+            mode= diffence;
         }
     }
     //printScoreBoard(scoreBoard);
